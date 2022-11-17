@@ -19,7 +19,7 @@ import { NativeConfig } from './native-config';
   providedIn: 'root'
 })
 export class DevicePlugin {
-  protected debug = true && NativeConfig.debugEnabled;
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
 
   isReady = false;
 
@@ -29,6 +29,7 @@ export class DevicePlugin {
     public plt: Platform,
     // public electronService: ElectronService,
   ) {
+    console.log(this.constructor.name,this.debug);
     if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
     this.plt.ready().then(() => {
       this.getInfo().then(info => {

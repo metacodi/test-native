@@ -1,2 +1,7 @@
 
-export const NativeConfig = { debugEnabled: false } as any;
+export const NativeConfig = { 
+  debugEnabled: false,
+  debugPlugins: [
+    'DevicePlugin',
+  ]
+};

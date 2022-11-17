@@ -17,7 +17,11 @@ import { AppRoutingModule } from './app-routing.module';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    NativeModule.forRoot({ debugEnabled: true }),
+    NativeModule.forRoot({ debugEnabled: true, 
+      debugPlugins: [
+        'DevicePlugin',
+      ] 
+    }),
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
