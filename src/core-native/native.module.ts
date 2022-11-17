@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 
 // import { Badge } from '@awesome-cordova-plugins/badge/ngx';
 // import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
@@ -10,6 +10,7 @@ import { NgModule } from '@angular/core';
 
 // import { BadgePlugin } from './badge';
 import { DevicePlugin } from './device';
+import { NativeConfig } from './native-config';
 // import { FaceIdPlugin } from './face-id';
 // import { FileSystemPlugin } from './file-system';
 // import { GeolocationPlugin } from './geolocation';
@@ -43,6 +44,19 @@ import { DevicePlugin } from './device';
     // FileOpener,
   ],
 })
-export class NativeModule { }
+export class NativeModule  {
+
+  public static forRoot(config: any): ModuleWithProviders<NativeModule> {
+    return {
+      ngModule: NativeModule,
+      providers: [
+        {
+          provide: 'NativeConfig',
+          useValue: Object.assign(NativeConfig, config),
+        }
+      ]
+    };
+  }
+}
 
 

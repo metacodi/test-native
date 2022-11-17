@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Platforms } from '@ionic/core';
 import { Platform } from '@ionic/angular';
-// import { ElectronService } from 'ngx-electron';
-
-import { AppConfig } from 'src/core/app-config';
 
 import { BatteryInfo, Device, DeviceId, DeviceInfo, GetLanguageCodeResult, OperatingSystem } from '@capacitor/device';
+
+import { NativeConfig } from './native-config';
+
 
 /**
  * Wrapper para combinar plugins `Device` y `Platform` de `Cordova` o `Capacitor`.
@@ -19,7 +19,7 @@ import { BatteryInfo, Device, DeviceId, DeviceInfo, GetLanguageCodeResult, Opera
   providedIn: 'root'
 })
 export class DevicePlugin {
-  protected debug = true && AppConfig.debugEnabled;
+  protected debug = true && NativeConfig.debugEnabled;
 
   isReady = false;
 

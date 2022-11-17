@@ -1,3 +1,5 @@
+export { NativeModule } from './native.module';
+
 // export { AppPlugin } from './app';
 // export { BadgePlugin } from './badge';
 // export { BarcodePlugin } from './barcode';
