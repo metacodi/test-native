@@ -22,6 +22,10 @@ export const routes: Routes = [
   {
     path: 'keep-screen-on',
     loadChildren: () => import('./keep-screen-on/keep-screen-on.module').then( m => m.KeepScreenOnPageModule)
+  },
+  {
+    path: 'face-id',
+    loadChildren: () => import('./face-id/face-id.module').then( m => m.FaceIdPageModule)
   }
 ];
 

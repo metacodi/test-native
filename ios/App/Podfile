@@ -19,6 +19,7 @@ def capacitor_pods
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'CapawesomeCapacitorBadge', :path => '../../node_modules/@capawesome/capacitor-badge'
   pod 'MetacodiCapacitorElectron', :path => '../../node_modules/@metacodi/capacitor-electron'
+  pod 'CapacitorNativeBiometric', :path => '../../node_modules/capacitor-native-biometric'
 end
 
 target 'App' do

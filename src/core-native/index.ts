@@ -7,7 +7,7 @@ export { BadgePlugin } from './badge';
 export { CapacitorKeepScreenOnPlugin } from './keep-screen-on';
 export { DevicePlugin } from './device';
 // // export { ElectronPlugin } from './electron';
-// export { FaceIdPlugin, FaceIdResponse } from './face-id';
+export { FaceIdPlugin, FaceIdResponse } from './face-id';
 // export { FileSystemPlugin, FileSystemPluginDirectory, FileExistsResult, DownloadFileResult } from './file-system';
 // export { GeolocationPlugin } from './geolocation';
 // export { InAppBrowserPlugin } from './in-app-browser';

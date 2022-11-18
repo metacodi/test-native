@@ -22,6 +22,7 @@ import { AppRoutingModule } from './app-routing.module';
         'AppPlugin',
         'BadgePlugin',
         'DevicePlugin',
+        'FaceIdPlugin',
       ] 
     }),
   ],

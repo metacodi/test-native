@@ -17,6 +17,7 @@ dependencies {
     implementation project(':capacitor-status-bar')
     implementation project(':capawesome-capacitor-badge')
     implementation project(':metacodi-capacitor-electron')
+    implementation project(':capacitor-native-biometric')
 
 }
 

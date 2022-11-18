@@ -32,6 +32,7 @@
     "@capawesome/capacitor-badge": "^2.0.2",
     "@ionic/angular": "^6.1.9",
     "@metacodi/capacitor-electron": "^1.0.29",
+    "capacitor-native-biometric": "^4.1.3",
     "ionicons": "^6.0.3",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
