@@ -53,7 +53,7 @@ Cada vegada que angular, ionic o capacitor puja de versions utilitzarem aquest p
 
 1. I descomentant del l'arxiu `src/core-native/index.ts`, pq els puguis indexar.
 
-1. En cata component tens la manera de instalarlo, per exemple: `app.ts`
+1. En cada component tens la manera de instalarlo, per exemple: `app.ts`
 
     ```ts
       * **Capacitor**
@@ -61,4 +61,21 @@ Cada vegada que angular, ionic o capacitor puja de versions utilitzarem aquest p
       * - Api: {@link https://capacitorjs.com/docs/apis/app}
       * - Examples : {@link https://medium.com/javascript-in-plain-english/opening-another-app-from-your-ionic-5-app-becf8c098d0e}
       */
+    ```
+
+1. I¡Una verga feta la instalació del primer component iniciem IOS, android i Electron per provar
+
+    ```properties
+    ionic build
+    npx cap copy android
+    npx cap copy ios
+    npx cap copy @capacitor-community/electron
+
+    npx cap sync android
+    npx cap sync ios
+    npx cap sync @capacitor-community/electron
+
+    npx cap open android
+    npx cap open ios
+    npx cap open @capacitor-community/electron
     ```
