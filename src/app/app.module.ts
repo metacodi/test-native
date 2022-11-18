@@ -19,6 +19,8 @@ import { AppRoutingModule } from './app-routing.module';
     AppRoutingModule,
     NativeModule.forRoot({ debugEnabled: true, 
       debugPlugins: [
+        'AppPlugin',
+        'BadgePlugin',
         'DevicePlugin',
       ] 
     }),

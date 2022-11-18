@@ -26,9 +26,10 @@ Cada vegada que angular, ionic o capacitor puja de versions utilitzarem aquest p
     ionic serve
     ```
 
-1. Instalem ios i androdid, https://capacitorjs.com/docs/getting-startedpero 
+1. Instalem ios i androdid, https://capacitorjs.com/docs/getting-started 
 
     ```properties
+    npm i @capacitor/android @capacitor/ios
     npx cap add android
     npx cap add ios
     ```
@@ -49,7 +50,7 @@ Cada vegada que angular, ionic o capacitor puja de versions utilitzarem aquest p
 
 1. Aquest components els tenim en el projecte a la carpeta `src/core-native`
 
-      <img src="core-native.png" style="max-width: 200px">]
+      [<img src="readme-images/core-native.png" style="max-width: 200px">]
 
 1. I descomentant del l'arxiu `src/core-native/index.ts`, pq els puguis indexar.
 
@@ -79,3 +80,7 @@ Cada vegada que angular, ionic o capacitor puja de versions utilitzarem aquest p
     npx cap open ios
     npx cap open @capacitor-community/electron
     ```
+
+1. Has de tenir el SDK de la versió 11.
+
+      [<img src="readme-images/android-preferences.png" style="max-width: 900px">]

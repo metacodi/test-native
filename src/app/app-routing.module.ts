@@ -18,6 +18,10 @@ export const routes: Routes = [
   {
     path: 'badge',
     loadChildren: () => import('./badge/badge.module').then( m => m.BadgePageModule)
+  },
+  {
+    path: 'keep-screen-on',
+    loadChildren: () => import('./keep-screen-on/keep-screen-on.module').then( m => m.KeepScreenOnPageModule)
   }
 ];
 

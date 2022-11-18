@@ -4,7 +4,7 @@ export { AppPlugin } from './app';
 export { BadgePlugin } from './badge';
 // export { BarcodePlugin } from './barcode';
 // export { BackgroundModePlugin } from './background-mode';
-// export { CapacitorKeepScreenOnPlugin } from './keep-screen-on';
+export { CapacitorKeepScreenOnPlugin } from './keep-screen-on';
 export { DevicePlugin } from './device';
 // // export { ElectronPlugin } from './electron';
 // export { FaceIdPlugin, FaceIdResponse } from './face-id';

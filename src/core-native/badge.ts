@@ -56,6 +56,11 @@ export class BadgePlugin {
     return Badge.decrease();
   }
 
+  /** Estableix a 0 el valor del Badge */
+  async clear(): Promise<void> {
+    return Badge.clear();
+  }
+
   /**
    * export interface PermissionStatus {
    *   display: PermissionState; <--- 'prompt' | 'prompt-with-rationale' | 'granted' | 'denied';

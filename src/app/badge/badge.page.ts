@@ -22,6 +22,7 @@ export class BadgePage implements OnInit {
     { fn: 'decrease', args: [] }, 
     { fn: 'checkPermissions', args: [] }, 
     { fn: 'requestPermissions', args: [] }, 
+    { fn: 'clear', args: [] }, 
     { fn: 'setBagde', args: [10], label: 'setBage 10' }, 
 
   ]
