@@ -19,6 +19,25 @@ Cada vegada que angular, ionic o capacitor puja de versions utilitzarem aquest p
 
 1. Copiarem tal cual la carpeta `app` al nou projecte.
 
+
+1. Tenim q compilar el nou projecte.
+
+    ```properties
+    ionic serve
+    ```
+
+1. Instalem ios i androdid, https://capacitorjs.com/docs/getting-startedpero 
+
+    ```properties
+    npx cap add android
+    npx cap add ios
+    ```
+
+1. Instalem electron https://capacitor-community.github.io/electron/docs/gettingstarted
+    ```properties
+    npm i @capacitor-community/electron
+    ```
+
 1. En aquesta carpeta tenim `src/app/app-routing.module.ts`. On tindrem que anar descomentant els component que volguem provar.
 
     ```ts
