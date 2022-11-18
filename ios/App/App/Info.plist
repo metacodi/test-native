@@ -47,5 +47,10 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>For an easier and faster log in.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>location</string>
+	</array>
 </dict>
 </plist>

@@ -1,5 +1,6 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 // import { Badge } from '@awesome-cordova-plugins/badge/ngx';
 // import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 // import { Media } from '@awesome-cordova-plugins/media/ngx';
@@ -42,6 +43,7 @@ import { NativeConfig } from './native-config';
     // Media,
     // File,
     // FileOpener,
+    BackgroundMode
   ],
 })
 export class NativeModule  {

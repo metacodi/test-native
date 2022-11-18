@@ -26,6 +26,14 @@ export const routes: Routes = [
   {
     path: 'face-id',
     loadChildren: () => import('./face-id/face-id.module').then( m => m.FaceIdPageModule)
+  },
+  {
+    path: 'file-system',
+    loadChildren: () => import('./file-system/file-system.module').then( m => m.FileSystemPageModule)
+  },
+  {
+    path: 'background-mode',
+    loadChildren: () => import('./background-mode/background-mode.module').then( m => m.BackgroundModePageModule)
   }
 ];
 

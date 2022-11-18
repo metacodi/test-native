@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>file-system</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-button (click)="openfile()" style="text-transform: none;"> Open File </ion-button>
+  <ion-button (click)="fileExist()" style="text-transform: none;"> Exist File </ion-button>
+  <ion-button (click)="deleteFile()" style="text-transform: none;"> Delete File </ion-button>
+  
+  <pre>{{results | json }}</pre>
+</ion-content>

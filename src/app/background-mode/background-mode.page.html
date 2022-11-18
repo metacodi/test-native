@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>background-mode</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-button *ngFor="let method of methods" (click)="invokeMethod(method)" style="text-transform: none;"> {{label(method)}} </ion-button>
+  
+  <p>isEnabled: {{device.isEnabled}}</p>
+  <p>isActive: {{device.isActive}}</p>
+
+  <pre>{{results | json }}</pre>
+</ion-content>

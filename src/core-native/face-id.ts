@@ -18,6 +18,16 @@ export type FaceIdResponse = 'TouchId' | 'FaceId' | 'None';
  *
  * - Api: {@link https://github.com/epicshaggy/capacitor-native-biometric}
  *
+ * * Install * 
+ * 
+ * npm i capacitor-native-biometric
+ * 
+ * Info.plist
+ * <key>NSFaceIDUsageDescription</key>
+ * <string>For an easier and faster log in.</string>
+ *
+ * AndroidManifest.xml
+ * <uses-permission android:name="android.permission.USE_BIOMETRIC">
  */
 @Injectable({
   providedIn: 'root'
