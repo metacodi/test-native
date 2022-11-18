@@ -16,10 +16,10 @@ export class DevicePage implements OnInit {
   }
 
   methods = [
-    { fn: 'getInfo', args: [] }, 
-    { fn: 'getId', args: [] }, 
-    { fn: 'getLanguageCode', args: [] }, 
-    { fn: 'getBatteryInfo', args: [] }, 
+    { fn: 'getInfo', args: []}, 
+    { fn: 'getId', args: []}, 
+    { fn: 'getLanguageCode', args: []}, 
+    { fn: 'getBatteryInfo', args: []}, 
   ]
 
   async invokeMethod(method: {fn: string, args: any[]}) {
@@ -30,5 +30,6 @@ export class DevicePage implements OnInit {
     }
   }
  
+  label(method: any): string { return method?.label ? method.label : method.fn; }
 
 }

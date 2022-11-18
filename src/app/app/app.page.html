@@ -8,7 +8,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-button *ngFor="let method of methods" (click)="invokeMethod(method)" style="text-transform: none;"> {{method.fn}} </ion-button>
+  <ion-button *ngFor="let method of methods" (click)="invokeMethod(method)" style="text-transform: none;"> {{label(method)}} </ion-button>
   
   <pre>{{results | json }}</pre>
 </ion-content>

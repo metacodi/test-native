@@ -14,6 +14,10 @@ export const routes: Routes = [
   {
     path: 'app',
     loadChildren: () => import('./app/app.module').then( m => m.AppPageModule)
+  },
+  {
+    path: 'badge',
+    loadChildren: () => import('./badge/badge.module').then( m => m.BadgePageModule)
   }
 ];
 

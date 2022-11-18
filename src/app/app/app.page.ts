@@ -17,7 +17,8 @@ export class AppPage implements OnInit {
   }
 
   methods = [
-    { fn: 'getInfo', args: [] }, 
+    { fn: 'getInfo', args: []},
+    { fn: 'exitApp', args: []}, 
 
   ]
 
@@ -29,5 +30,6 @@ export class AppPage implements OnInit {
     }
   }
  
+  label(method: any): string { return method?.label ? method.label : method.fn; }
 
 }
