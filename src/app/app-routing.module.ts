@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'device',
+    redirectTo: 'local-notifications',
     pathMatch: 'full'
   },
   {
@@ -34,6 +34,22 @@ export const routes: Routes = [
   {
     path: 'background-mode',
     loadChildren: () => import('./background-mode/background-mode.module').then( m => m.BackgroundModePageModule)
+  },
+  {
+    path: 'geolocation',
+    loadChildren: () => import('./geolocation/geolocation.module').then( m => m.GeolocationPageModule)
+  },
+  {
+    path: 'in-app-browser',
+    loadChildren: () => import('./in-app-browser/in-app-browser.module').then( m => m.InAppBrowserPageModule)
+  },
+  {
+    path: 'keyboard',
+    loadChildren: () => import('./keyboard/keyboard.module').then( m => m.KeyboardPageModule)
+  },
+  {
+    path: 'local-notifications',
+    loadChildren: () => import('./local-notifications/local-notifications.module').then( m => m.LocalNotificationsPageModule)
   }
 ];
 

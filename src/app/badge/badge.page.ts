@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BadgePlugin } from 'src/core-native';
+import { BadgePlugin, DevicePlugin } from 'src/core-native';
 
 @Component({
   selector: 'app-badge',
@@ -8,7 +8,9 @@ import { BadgePlugin } from 'src/core-native';
 })
 export class BadgePage implements OnInit {
 
-  constructor(public device: BadgePlugin) { }
+  constructor(
+    public device: DevicePlugin,
+    public badge: BadgePlugin) { }
 
   results: any = {}
 
@@ -30,7 +32,7 @@ export class BadgePage implements OnInit {
   async invokeMethod(method: {fn: string, args: any[]}) {
     try {
        
-      this.results = await (this.device as any)[method.fn](...method.args);
+      this.results = await (this.badge as any)[method.fn](...method.args);
     } catch (error) {
       this.results = error;
     }

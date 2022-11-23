@@ -31,6 +31,17 @@ import { NativeConfig } from './native-config';
 	 </array>
  */
 
+/**
+ * NOTA: A partir de la versió 31 i derreres s'ha de fer una modificació a l'axiu:
+ * /node_modules/cordova-plugin-background-mode/src/android/ForegroundService.java
+ * 
+ * Linia 225
+ * PendingIntent.FLAG_UPDATE_CURRENT);
+ * 
+ * Canviar per 
+ * PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+ */
+
 @Injectable({
   providedIn: 'root'
 })
@@ -44,36 +55,40 @@ export class BackgroundModePlugin {
     if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
   }
 
-  enable() {
-    if (!this.isEnabled) {
-      this.backgroundMode.enable();
-    }
+  async enable() {
+    if (!this.device.isRealPhone || this.isEnabled) { return; }
+    await this.backgroundMode.enable();
+    setTimeout(() => { if (!this.isEnabled) { this.enable(); } }, 500);
   }
-
-  disable() {
-    if (this.isEnabled) {
-      this.backgroundMode.disable();
-    }
+  
+  async disable() {
+    if (!this.device.isRealPhone || !this.isEnabled) { return; }
+    await this.backgroundMode.disable();
+    setTimeout(() => { if (this.isEnabled) { this.disable(); } }, 500);
   }
 
   disableBatteryOptimizations() {
+    if (!this.device.isRealPhone) { return; }
     this.backgroundMode.disableBatteryOptimizations();
   }
 
   moveToForeground() {
+    if (!this.device.isRealPhone) { return; }
     this.backgroundMode.moveToForeground();
   }
 
   wakeUp() {
+    if (!this.device.isRealPhone) { return; }
     this.backgroundMode.wakeUp();
   }
 
   moveToBackground() {
+    if (!this.device.isRealPhone) { return; }
     this.backgroundMode.moveToBackground();
   }
 
-  get isEnabled(): boolean { return this.backgroundMode.isEnabled(); }
+  get isEnabled(): boolean { return this.device.isRealPhone ? this.backgroundMode.isEnabled() : false; }
 
-  get isActive(): boolean { return this.backgroundMode.isActive(); }
+  get isActive(): boolean { return this.device.isRealPhone ? this.backgroundMode.isActive() : false; }
 
 }

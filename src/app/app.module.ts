@@ -24,6 +24,11 @@ import { AppRoutingModule } from './app-routing.module';
         'DevicePlugin',
         'FaceIdPlugin',
         'FileSystemPlugin',
+        'BackgroundModePlugin',
+        'GeolocationPlugin',
+        'InAppBrowserPlugin',
+        'KeyboardPlugin',
+        'LocalNotificationsPlugin',
       ] 
     }),
   ],

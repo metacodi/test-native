@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BackgroundModePlugin } from 'src/core-native';
+import { BackgroundModePlugin, DevicePlugin } from 'src/core-native';
 
 @Component({
   selector: 'app-background-mode',
@@ -8,7 +8,10 @@ import { BackgroundModePlugin } from 'src/core-native';
 })
 export class BackgroundModePage implements OnInit {
 
-  constructor(public device: BackgroundModePlugin) { }
+  constructor(
+    public device: DevicePlugin,
+    public backgroundModePlugin: BackgroundModePlugin,
+  ) { }
 
   results: any = {}
 
@@ -28,7 +31,7 @@ export class BackgroundModePage implements OnInit {
   async invokeMethod(method: {fn: string, args: any[]}) {
     try {
        
-      this.results = await (this.device as any)[method.fn](...method.args);
+      this.results = await (this.backgroundModePlugin as any)[method.fn](...method.args);
     } catch (error) {
       this.results = error;
     }

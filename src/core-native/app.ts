@@ -116,8 +116,13 @@ export class AppPlugin {
    * const state = { isActive: true }
    * ```
    */
-  async getState(): Promise<AppState> {
-    return App.getState();
+  async getState(): Promise<AppState | undefined> {
+    return this.device.ready().then(() => {
+      if (this.device.isRealPhone || this.device.isElectron) {
+        return App.getState();
+      }
+      return Promise.resolve(undefined);
+    }); 
   }
 
   /** Get the URL the app was launched with, if any.

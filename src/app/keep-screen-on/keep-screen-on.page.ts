@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CapacitorKeepScreenOnPlugin } from 'src/core-native';
+import { CapacitorKeepScreenOnPlugin, DevicePlugin } from 'src/core-native';
 
 @Component({
   selector: 'app-keep-screen-on',
@@ -8,7 +8,10 @@ import { CapacitorKeepScreenOnPlugin } from 'src/core-native';
 })
 export class KeepScreenOnPage implements OnInit {
 
-  constructor(public device: CapacitorKeepScreenOnPlugin) { }
+  constructor(
+    public device: DevicePlugin,
+    public keep: CapacitorKeepScreenOnPlugin
+  ) { }
 
   results: any = {}
 
@@ -26,7 +29,7 @@ export class KeepScreenOnPage implements OnInit {
   async invokeMethod(method: {fn: string, args: any[]}) {
     try {
        
-      this.results = await (this.device as any)[method.fn](...method.args);
+      this.results = await (this.keep as any)[method.fn](...method.args);
     } catch (error) {
       this.results = error;
     }
