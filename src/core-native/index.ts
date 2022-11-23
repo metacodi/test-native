@@ -17,7 +17,7 @@ export { MediaPlugin } from './media';
 // // export { MotionPlugin } from './motion';
 // // export { NavigationBarPlugin } from './navigation-bar';
 export { NavigationBarColorPlugin } from './navigation-bar-color';
-// export { NetworkPlugin } from './network';
+export { NetworkPlugin } from './network';
 // export { SpeechRecognitionPlugin } from './speech-recognition';
 // export { SplashScreenPlugin } from './splash-screen';
 // export { StatusBarPlugin } from './status-bar';

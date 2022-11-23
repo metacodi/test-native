@@ -58,6 +58,10 @@ export const routes: Routes = [
   {
     path: 'navigationbar-color',
     loadChildren: () => import('./navigationbar-color/navigationbar-color.module').then( m => m.NavigationbarColorPageModule)
+  },
+  {
+    path: 'network',
+    loadChildren: () => import('./network/network.module').then( m => m.NetworkPageModule)
   }
 ];
 
