@@ -24,7 +24,7 @@ dependencies {
     implementation project(':capawesome-capacitor-badge')
     implementation project(':metacodi-capacitor-electron')
     implementation project(':capacitor-native-biometric')
-
+    implementation "androidx.webkit:webkit:1.4.0"
 }
 
 

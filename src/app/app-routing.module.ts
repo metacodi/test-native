@@ -54,6 +54,10 @@ export const routes: Routes = [
   {
     path: 'media',
     loadChildren: () => import('./media/media.module').then( m => m.MediaPageModule)
+  },
+  {
+    path: 'navigationbar-color',
+    loadChildren: () => import('./navigationbar-color/navigationbar-color.module').then( m => m.NavigationbarColorPageModule)
   }
 ];
 

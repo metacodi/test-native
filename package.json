@@ -49,6 +49,7 @@
     "cordova-plugin-file": "^7.0.0",
     "cordova-plugin-inappbrowser": "^5.0.0",
     "cordova-plugin-media": "^6.1.0",
+    "cordova-plugin-navigationbar-color": "^0.1.0",
     "file-saver": "^2.0.5",
     "ionicons": "^6.0.3",
     "rxjs": "~7.5.0",
