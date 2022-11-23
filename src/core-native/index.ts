@@ -13,7 +13,7 @@ export { GeolocationPlugin } from './geolocation';
 export { InAppBrowserPlugin } from './in-app-browser';
 export { KeyboardPlugin } from './keyboard';
 export { LocalNotificationPlugin } from './local-notification';
-// export { MediaPlugin } from './media';
+export { MediaPlugin } from './media';
 // // export { MotionPlugin } from './motion';
 // // export { NavigationBarPlugin } from './navigation-bar';
 // export { NavigationBarColorPlugin } from './navigation-bar-color';

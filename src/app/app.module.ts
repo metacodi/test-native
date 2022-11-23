@@ -29,6 +29,7 @@ import { AppRoutingModule } from './app-routing.module';
         'InAppBrowserPlugin',
         'KeyboardPlugin',
         'LocalNotificationsPlugin',
+        'MediaPlugin',
       ] 
     }),
   ],

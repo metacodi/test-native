@@ -3,8 +3,8 @@ import { NgModule, ModuleWithProviders } from '@angular/core';
 import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 // import { Badge } from '@awesome-cordova-plugins/badge/ngx';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
-// import { Media } from '@awesome-cordova-plugins/media/ngx';
-// import { File } from '@awesome-cordova-plugins/file/ngx';
+import { Media } from '@awesome-cordova-plugins/media/ngx';
+import { File } from '@awesome-cordova-plugins/file/ngx';
 // import { FileOpener } from '@awesome-cordova-plugins/file-opener/ngx';
 
 // import { AppPlugin } from './app';
@@ -40,8 +40,8 @@ import { NativeConfig } from './native-config';
   providers: [
     // Badge,
     InAppBrowser,
-    // Media,
-    // File,
+    Media,
+    File,
     // FileOpener,
     BackgroundMode
   ],

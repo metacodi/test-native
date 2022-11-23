@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'local-notifications',
+    redirectTo: 'media',
     pathMatch: 'full'
   },
   {
@@ -50,6 +50,10 @@ export const routes: Routes = [
   {
     path: 'local-notifications',
     loadChildren: () => import('./local-notifications/local-notifications.module').then( m => m.LocalNotificationsPageModule)
+  },
+  {
+    path: 'media',
+    loadChildren: () => import('./media/media.module').then( m => m.MediaPageModule)
   }
 ];
 
