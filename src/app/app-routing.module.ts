@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'media',
+    redirectTo: 'splash-screen',
     pathMatch: 'full'
   },
   {
@@ -62,6 +62,10 @@ export const routes: Routes = [
   {
     path: 'network',
     loadChildren: () => import('./network/network.module').then( m => m.NetworkPageModule)
+  },
+  {
+    path: 'splash-screen',
+    loadChildren: () => import('./splash-screen/splash-screen.module').then( m => m.SplashScreenPageModule)
   }
 ];
 

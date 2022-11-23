@@ -23,6 +23,7 @@ def capacitor_pods
   pod 'CapacitorKeyboard', :path => '../../node_modules/@capacitor/keyboard'
   pod 'CapacitorLocalNotifications', :path => '../../node_modules/@capacitor/local-notifications'
   pod 'CapacitorNetwork', :path => '../../node_modules/@capacitor/network'
+  pod 'CapacitorSplashScreen', :path => '../../node_modules/@capacitor/splash-screen'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'CapawesomeCapacitorBadge', :path => '../../node_modules/@capawesome/capacitor-badge'
   pod 'MetacodiCapacitorElectron', :path => '../../node_modules/@metacodi/capacitor-electron'
