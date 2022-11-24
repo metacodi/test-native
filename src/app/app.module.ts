@@ -8,7 +8,7 @@ import { NativeModule } from 'src/core-native';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-
+import { IonicStorageModule } from '@ionic/storage-angular';
 @NgModule({
   declarations: [
     AppComponent
@@ -16,6 +16,7 @@ import { AppRoutingModule } from './app-routing.module';
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
+    IonicStorageModule.forRoot(),
     AppRoutingModule,
     NativeModule.forRoot({ debugEnabled: true, 
       debugPlugins: [
@@ -30,6 +31,7 @@ import { AppRoutingModule } from './app-routing.module';
         'KeyboardPlugin',
         'LocalNotificationsPlugin',
         'MediaPlugin',
+        'StoragePlugin',
       ] 
     }),
   ],

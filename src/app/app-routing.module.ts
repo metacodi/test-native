@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'status-bar',
+    redirectTo: 'storage',
     pathMatch: 'full'
   },
   {
@@ -70,6 +70,10 @@ export const routes: Routes = [
   {
     path: 'status-bar',
     loadChildren: () => import('./status-bar/status-bar.module').then( m => m.StatusBarPageModule)
+  },
+  {
+    path: 'storage',
+    loadChildren: () => import('./storage/storage.module').then( m => m.StoragePageModule)
   }
 ];
 

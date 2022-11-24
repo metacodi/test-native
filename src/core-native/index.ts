@@ -21,4 +21,4 @@ export { NetworkPlugin } from './network';
 // export { SpeechRecognitionPlugin } from './speech-recognition';
 export { SplashScreenPlugin } from './splash-screen';
 export { StatusBarPlugin } from './status-bar';
-// export { StoragePlugin } from './storage';
+export { StoragePlugin } from './storage';
