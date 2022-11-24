@@ -62,5 +62,9 @@
   <array>
     <string>location</string>
   </array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>For calls VOICE IP</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Recognize speech</string>
 </dict>
 </plist>

@@ -32,6 +32,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
         'LocalNotificationsPlugin',
         'MediaPlugin',
         'StoragePlugin',
+        'SpeechRecognitionPlugin',
       ] 
     }),
   ],

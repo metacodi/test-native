@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'storage',
+    redirectTo: 'speech-recognition',
     pathMatch: 'full'
   },
   {
@@ -74,6 +74,10 @@ export const routes: Routes = [
   {
     path: 'storage',
     loadChildren: () => import('./storage/storage.module').then( m => m.StoragePageModule)
+  },
+  {
+    path: 'speech-recognition',
+    loadChildren: () => import('./speech-recognition/speech-recognition.module').then( m => m.SpeechRecognitionPageModule)
   }
 ];
 

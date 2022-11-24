@@ -14,6 +14,7 @@ export const NativeConfig = {
     'LocalNotificationsPlugin',
     'MediaPlugin',
     'StoragePlugin',
+    'SpeechRecognitionPlugin',
   ],
   app: {
     package: 'com.metacodi.taxi',
