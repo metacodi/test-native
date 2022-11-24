@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'splash-screen',
+    redirectTo: 'status-bar',
     pathMatch: 'full'
   },
   {
@@ -66,6 +66,10 @@ export const routes: Routes = [
   {
     path: 'splash-screen',
     loadChildren: () => import('./splash-screen/splash-screen.module').then( m => m.SplashScreenPageModule)
+  },
+  {
+    path: 'status-bar',
+    loadChildren: () => import('./status-bar/status-bar.module').then( m => m.StatusBarPageModule)
   }
 ];
 
