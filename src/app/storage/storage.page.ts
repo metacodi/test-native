@@ -18,6 +18,7 @@ export class StoragePage implements OnInit {
   methods = [
     { fn: 'set', args: ['name1', { name: 'Nom 1', surmane: 'Cognoms 1'}, 'testNative'], label: 'set 1' }, 
     { fn: 'set', args: ['name2', { name: 'Nom 2', surmane: 'Cognoms 2'}, 'testNative'], label: 'set 2' }, 
+    { fn: 'set', args: ['name3', 'pop', 'testNative'], label: 'set 3' }, 
     { fn: 'get', args: ['name1', 'testNative'], label: 'get 1' }, 
     { fn: 'get', args: ['name2', 'testNative'], label: 'get 2' }, 
     { fn: 'remove', args: ['name1', 'testNative'], label: 'remove 1' }, 

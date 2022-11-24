@@ -22,6 +22,10 @@ import { NativeConfig } from './native-config';
  *        IonicStorageModule.forRoot()
  *      ]
  *    })
+ * 
+ * NOTA: les dades es guarden en Aplication -> IndexedDB -> _ionicstorage -> http://localhost:8100 -> ionickv
+ * 
+ * {@link https://developer.chrome.com/docs/devtools/storage/indexeddb/?utm_source=devtools }
  */
 @Injectable({
   providedIn: 'root'
@@ -38,7 +42,6 @@ export class StoragePlugin {
   }
 
   async init() {
-    // If using, define drivers here: await this.storage.defineDriver(/*...*/);
     const storage = await this.storage.create();
     this._storage = storage;
   }
@@ -57,7 +60,7 @@ export class StoragePlugin {
   /** Get the value associated with the given key. */
   async get(key: string, moduleName?: string): Promise<any> {
     const appName: string = this.packageName + (moduleName ? '.' + moduleName : '');
-    return this._storage.get(`${appName}.${key}`).then(value => value ? JSON.parse(value) : undefined);
+    return this._storage.get(`${appName}.${key}`).then(value => value ? value : undefined);
     // return new Promise<{value: string}>((resolve: any, reject: any) => {
     //     const appName: string = this.packageName + (moduleName ? '.' + moduleName : '');
     //     Storage.get({key : `${appName}.${key}`}).then(value => {
@@ -99,7 +102,7 @@ export class StoragePlugin {
   set(key: string, value: any, moduleName?: string): Promise<any> {
     return new Promise<any>((resolve: any, reject: any) => {
         const appName: string = this.packageName + (moduleName ? '.' + moduleName : '');
-        this._storage.set(`${appName}.${key}`, value ? JSON.stringify(value) : value).then(() => {
+        this._storage.set(`${appName}.${key}`, value ? value : undefined).then(() => {
           resolve(true);
       }).catch(error => reject(error));
     });
