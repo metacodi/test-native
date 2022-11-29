@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppPlugin } from 'src/core-native';
+import { AppPlugin, DevicePlugin } from 'src/core-native';
 
 @Component({
   selector: 'app-app',
@@ -9,7 +9,10 @@ import { AppPlugin } from 'src/core-native';
 export class AppPage implements OnInit {
 
   
-  constructor(public device: AppPlugin) { }
+  constructor(
+    public device: DevicePlugin,
+    public app: AppPlugin
+  ) { }
 
   results: any = {}
 
@@ -24,7 +27,7 @@ export class AppPage implements OnInit {
 
   async invokeMethod(method: {fn: string, args: any[]}) {
     try {
-      this.results = await (this.device as any)[method.fn](...method.args);
+      this.results = await (this.app as any)[method.fn](...method.args);
     } catch (error) {
       this.results = error;
     }

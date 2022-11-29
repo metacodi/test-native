@@ -52,5 +52,19 @@
 		<string>fetch</string>
 		<string>location</string>
 	</array>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Enabling the location service allows us to show you when the driver is nearby, so that the driver can find you</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Always allow Geolocation?</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Enabling the location service allows us to show you when the driver is nearby, so that the driver can find you</string>
+  <key>UIBackgroundModes</key>
+  <array>
+    <string>location</string>
+  </array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>For calls VOICE IP</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Recognize speech</string>
 </dict>
 </plist>

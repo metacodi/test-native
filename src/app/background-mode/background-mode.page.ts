@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BackgroundModePlugin } from 'src/core-native';
+import { BackgroundModePlugin, DevicePlugin } from 'src/core-native';
 
 
 type PluginFnArgs = { name: keyof BackgroundModePlugin, args: any[] };
@@ -11,7 +11,10 @@ type PluginFnArgs = { name: keyof BackgroundModePlugin, args: any[] };
 })
 export class BackgroundModePage implements OnInit {
 
-  constructor(public device: BackgroundModePlugin) { }
+  constructor(
+    public device: DevicePlugin,
+    public backgroundModePlugin: BackgroundModePlugin,
+  ) { }
 
   results: any = {}
 
@@ -29,7 +32,7 @@ export class BackgroundModePage implements OnInit {
 
   async invokeMethod(fn: PluginFnArgs) {
     try {
-      this.results = await this.device[fn.name](...fn.args);
+      this.results = await this.backgroundModePlugin[fn.name](...fn.args);
     } catch (error) {
       this.results = error;
     }

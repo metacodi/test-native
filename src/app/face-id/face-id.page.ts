@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FaceIdPlugin } from 'src/core-native';
+import { DevicePlugin, FaceIdPlugin } from 'src/core-native';
 
 @Component({
   selector: 'app-face-id',
@@ -8,7 +8,9 @@ import { FaceIdPlugin } from 'src/core-native';
 })
 export class FaceIdPage implements OnInit {
 
-  constructor(public device: FaceIdPlugin) { }
+  constructor(
+    public device: DevicePlugin,
+    public badge: FaceIdPlugin) { }
 
   results: any = {}
 
@@ -28,7 +30,7 @@ export class FaceIdPage implements OnInit {
   async invokeMethod(method: {fn: string, args: any[]}) {
     try {
        
-      this.results = await (this.device as any)[method.fn](...method.args);
+      this.results = await (this.badge as any)[method.fn](...method.args);
     } catch (error) {
       this.results = error;
     }
