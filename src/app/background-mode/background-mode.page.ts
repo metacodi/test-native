@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { BackgroundModePlugin } from 'src/core-native';
 
+
+type PluginFnArgs = { name: keyof BackgroundModePlugin, args: any[] };
+
 @Component({
   selector: 'app-background-mode',
   templateUrl: './background-mode.page.html',
@@ -15,20 +18,18 @@ export class BackgroundModePage implements OnInit {
   ngOnInit() {
   }
 
-  methods = [
-    { fn: 'enable', args: [] }, 
-    { fn: 'disable', args: [] }, 
-    { fn: 'disableBatteryOptimizations', args: [] }, 
-    { fn: 'moveToForeground', args: [] }, 
-    { fn: 'wakeUp', args: [] }, 
-    { fn: 'moveToBackground', args: [] }, 
-    
+  methods: PluginFnArgs[] = [
+    { name: 'enable', args: [] },
+    { name: 'disable', args: [] },
+    { name: 'disableBatteryOptimizations', args: [] },
+    { name: 'moveToForeground', args: [] },
+    { name: 'wakeUp', args: [] },
+    { name: 'moveToBackground', args: [] },
   ]
 
-  async invokeMethod(method: {fn: string, args: any[]}) {
+  async invokeMethod(fn: PluginFnArgs) {
     try {
-       
-      this.results = await (this.device as any)[method.fn](...method.args);
+      this.results = await this.device[fn.name](...fn.args);
     } catch (error) {
       this.results = error;
     }
