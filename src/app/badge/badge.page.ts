@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { BadgePlugin, DevicePlugin } from 'src/core-native';
+import { BadgePlugin } from 'src/core-native';
+
+
+type PluginFnArgs = { name: keyof BadgePlugin, args: any[], label?: string };
 
 @Component({
   selector: 'app-badge',
@@ -9,35 +12,34 @@ import { BadgePlugin, DevicePlugin } from 'src/core-native';
 export class BadgePage implements OnInit {
 
   constructor(
-    public device: DevicePlugin,
-    public badge: BadgePlugin) { }
+    public plugin: BadgePlugin,
+  ) { }
 
   results: any = {}
 
   ngOnInit() {
   }
 
-  methods = [
-    { fn: 'isSupported', args: [] }, 
-    { fn: 'get', args: [] }, 
-    { fn: 'increase', args: [] }, 
-    { fn: 'decrease', args: [] }, 
-    { fn: 'checkPermissions', args: [] }, 
-    { fn: 'requestPermissions', args: [] }, 
-    { fn: 'clear', args: [] }, 
-    { fn: 'setBagde', args: [10], label: 'setBage 10' }, 
-
+  methods: PluginFnArgs[] = [
+    { name: 'isSupported', args: [] }, 
+    { name: 'get', args: [] }, 
+    { name: 'increase', args: [] }, 
+    { name: 'decrease', args: [] }, 
+    { name: 'checkPermissions', args: [] }, 
+    { name: 'requestPermissions', args: [] }, 
+    { name: 'clear', args: [] }, 
+    { name: 'setBagde', args: [10], label: 'setBage 10' },
   ]
 
-  async invokeMethod(method: {fn: string, args: any[]}) {
+  async invokeMethod(fn: PluginFnArgs) {
     try {
-       
-      this.results = await (this.badge as any)[method.fn](...method.args);
+      const f = this.plugin[fn.name];
+      this.results = await (this.plugin[fn.name] as Function)(...fn.args);
     } catch (error) {
       this.results = error;
     }
   }
 
-  label(method: any): string { return method?.label ? method.label : method.fn; }
+  label(method: PluginFnArgs): string { return method?.label ? method.label : method.name; }
 
 }
