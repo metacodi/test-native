@@ -78,6 +78,10 @@ export const routes: Routes = [
   {
     path: 'speech-recognition',
     loadChildren: () => import('./speech-recognition/speech-recognition.module').then( m => m.SpeechRecognitionPageModule)
+  },
+  {
+    path: 'text-zoom',
+    loadChildren: () => import('./text-zoom/text-zoom.module').then( m => m.TextZoomPageModule)
   }
 ];
 
