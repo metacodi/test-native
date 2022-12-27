@@ -165,22 +165,12 @@ then
   echo "do $1"
   echo "----------> npm i @angular/google-maps"
   npm i @angular/google-maps
-  echo "----------> npm i @awesome-cordova-plugins/action-sheet"
-  npm i @awesome-cordova-plugins/action-sheet
-  echo "----------> npm i @capawesome/capacitor-badge"
-  npm i @capawesome/capacitor-badge
+  echo "----------> npm i @awesome-cordova-plugins/background-mode"
+  npm i @awesome-cordova-plugins/background-mode
   echo "----------> npm i @awesome-cordova-plugins/calendar"
   npm i @awesome-cordova-plugins/calendar
-  echo "----------> npm i @awesome-cordova-plugins/core"
-  npm i @awesome-cordova-plugins/core
-  echo "----------> npm i @awesome-cordova-plugins/device"
-  npm i @awesome-cordova-plugins/device
-  echo "----------> npm i @awesome-cordova-plugins/dialogs"
-  npm i @awesome-cordova-plugins/dialogs
   echo "----------> npm i @awesome-cordova-plugins/file"
   npm i @awesome-cordova-plugins/file
-  echo "----------> npm i @awesome-cordova-plugins/file-opener"
-  npm i @awesome-cordova-plugins/file-opener
   echo "----------> npm i @awesome-cordova-plugins/in-app-browser"
   npm i @awesome-cordova-plugins/in-app-browser
   echo "----------> npm i @awesome-cordova-plugins/launch-navigator"
@@ -189,12 +179,12 @@ then
   npm i @awesome-cordova-plugins/media
   echo "----------> npm i @capacitor-community/background-geolocation"
   npm i @capacitor-community/background-geolocation
-  echo "----------> npm i @capacitor-community/barcode-scanner"
-  npm i @capacitor-community/barcode-scanner
   echo "----------> npm i @capacitor-community/electron"
   npm i @capacitor-community/electron
   echo "----------> npm i @capacitor-community/fcm"
   npm i @capacitor-community/fcm
+  echo "----------> npm i @capacitor-community/file-opener"
+  npm i @capacitor-community/file-opener
   echo "----------> npm i @capacitor-community/keep-awake"
   npm i @capacitor-community/keep-awake
   echo "----------> npm i @capacitor-community/speech-recognition"
@@ -213,14 +203,16 @@ then
   npm i @capacitor/ios
   echo "----------> npm i @capacitor/local-notifications"
   npm i @capacitor/local-notifications
-  echo "----------> npm i @capacitor/motion"
-  npm i @capacitor/motion
   echo "----------> npm i @capacitor/network"
   npm i @capacitor/network
   echo "----------> npm i @capacitor/push-notifications"
   npm i @capacitor/push-notifications
   echo "----------> npm i @capacitor/splash-screen"
   npm i @capacitor/splash-screen
+    echo "----------> npm i @capacitor/capacitor-app-update"
+  npm i @capacitor/capacitor-app-update
+    echo "----------> npm i @capacitor/capacitor-badge"
+  npm i @capacitor/capacitor-badge
   echo "----------> npm i @ionic/storage-angular"
   npm i @ionic/storage-angular
   echo "----------> npm i @logisticinfotech/ionic4-datepicker"
@@ -231,8 +223,6 @@ then
   npm i @ngx-translate/core
   echo "----------> npm i @ngx-translate/http-loader"
   npm i @ngx-translate/http-loader
-  echo "----------> npm i @capawesome/capacitor-app-update"
-  npm i @capawesome/capacitor-app-update
   echo "----------> npm i @types/file-saver"
   npm i @types/file-saver
   echo "----------> npm i angular-svg-icon"
@@ -241,6 +231,8 @@ then
   npm i capacitor-native-biometric
   echo "----------> npm i cordova-plugin-actionsheet"
   npm i cordova-plugin-actionsheet
+  echo "----------> npm i cordova-plugin-background-mode"
+  npm i cordova-plugin-background-mode
   echo "----------> npm i cordova-plugin-calendar"
   npm i cordova-plugin-calendar
   echo "----------> npm i cordova-plugin-device"
@@ -249,8 +241,6 @@ then
   npm i cordova-plugin-dialogs
   echo "----------> npm i cordova-plugin-file"
   npm i cordova-plugin-file
-  echo "----------> npm i cordova-plugin-file-opener2"
-  npm i cordova-plugin-file-opener2
   echo "----------> npm i cordova-plugin-inappbrowser"
   npm i cordova-plugin-inappbrowser
   echo "----------> npm i cordova-plugin-media"
@@ -269,8 +259,6 @@ then
   npm i socket.io-client
   echo "----------> npm i uk.co.workingedge.phonegap.plugin.launchnavigator"
   npm i uk.co.workingedge.phonegap.plugin.launchnavigator
-  echo "----------> npm i zone.js"
-  npm i zone.js
   sh do npmidev
   sh do platforms
 fi

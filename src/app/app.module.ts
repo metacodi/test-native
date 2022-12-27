@@ -33,6 +33,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
         'MediaPlugin',
         'StoragePlugin',
         'SpeechRecognitionPlugin',
+        'TextZoomPlugin',
       ] 
     }),
   ],
