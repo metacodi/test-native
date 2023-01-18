@@ -22,4 +22,5 @@ export { SpeechRecognitionPlugin } from './speech-recognition';
 export { SplashScreenPlugin } from './splash-screen';
 export { StatusBarPlugin } from './status-bar';
 export { StoragePlugin } from './storage';
+export { TextToSpeechPlugin } from './text-to-speech';
 export { TextZoomPlugin } from './text-zoom';

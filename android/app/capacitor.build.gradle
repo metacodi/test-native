@@ -14,6 +14,7 @@ dependencies {
     implementation project(':capacitor-community-file-opener')
     implementation project(':capacitor-community-keep-awake')
     implementation project(':capacitor-community-speech-recognition')
+    implementation project(':capacitor-community-text-to-speech')
     implementation project(':capacitor-action-sheet')
     implementation project(':capacitor-app')
     implementation project(':capacitor-device')

@@ -82,6 +82,10 @@ export const routes: Routes = [
   {
     path: 'text-zoom',
     loadChildren: () => import('./text-zoom/text-zoom.module').then( m => m.TextZoomPageModule)
+  },
+  {
+    path: 'text-to-speech',
+    loadChildren: () => import('./text-to-speech/text-to-speech.module').then( m => m.TextToSpeechPageModule)
   }
 ];
 
