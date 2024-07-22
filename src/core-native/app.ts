@@ -23,7 +23,7 @@ import { DevicePlugin } from './device';
   providedIn: 'root'
 })
 export class AppPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('AppPlugin');
 
   stateChangedSubject = new Subject<AppState>();
 
@@ -35,36 +35,42 @@ export class AppPlugin {
   ) {
     if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
 
-    device.ready().then(() => {
-      // NOTA: Evitem que ens els navegadors i/o Electron es descon al canviar de pantalla.
-      if (this.device.isRealPhone) {
-        // Ens suscribim als canvis d'estat per notificar-los a través del BehaviorSubject creat.
-        App.addListener('appStateChange', state => this.stateChangedSubject.next(state));
-      }
-
-      /** A la documentació diu que el eventName és 'ionBackButton'.
-       * > "When running in a Capacitor or Cordova application, Ionic Framework
-       * >  will emit an ionBackButton event when a user presses the hardware back button."
-       * {@link https://ionicframework.com/docs/developing/hardware-back-button#hardware-back-button-in-capacitor-and-cordova }
-       */
-      // if (this.device.isAndroid) {
-        App.addListener('backButton', (data: BackButtonListenerEvent) => {
-          if (this.debug) { console.log('backButton state:', JSON.stringify(data), this.router.url); }
-          const onRoot = !data.canGoBack || this.router.url === '/home' || this.router.url === '/login';
-          if (onRoot) { this.exitApp(); }
-        });
-        // this.platform.ready().then(() => {
-        //   this.platform.backButton.subscribeWithPriority(-1, () => {
-        //     // const onRoot = !this.routerOutlet.canGoBack() || this.router.url === '/home' || this.router.url === '/login';
-        //     const onRoot = !this.routerOutlet.canGoBack();
-        //     if (this.debug) { console.log(this.constructor.name + '.ensureExitAppOnAndroid()', onRoot); }
-        //     if (onRoot) { App.exitApp(); }
-        //   });
-        // });
-      // }
-
-    });
+    this.listenAppStateChange();
+    this.listenBackButton();
   }
+
+  async listenAppStateChange() {
+    const isRealPhone = await this.device.isRealPhone;
+    if (isRealPhone) {
+      // Ens suscribim als canvis d'estat per notificar-los a través del BehaviorSubject creat.
+      App.addListener('appStateChange', state => this.stateChangedSubject.next(state));
+    }
+  }
+
+  async listenBackButton() {
+    /** A la documentació diu que el eventName és 'ionBackButton'.
+     * > "When running in a Capacitor or Cordova application, Ionic Framework
+     * >  will emit an ionBackButton event when a user presses the hardware back button."
+     * {@link https://ionicframework.com/docs/developing/hardware-back-button#hardware-back-button-in-capacitor-and-cordova }
+     */
+    const isRealPhone = await this.device.isRealPhone;
+    // if (this.device.isAndroid) {
+      App.addListener('backButton', (data: BackButtonListenerEvent) => {
+        if (this.debug) { console.log('backButton state:', JSON.stringify(data), this.router.url); }
+        const onRoot = !data.canGoBack || this.router.url === '/home' || this.router.url === '/login';
+        if (onRoot) { this.exitApp(); }
+      });
+      // this.platform.ready().then(() => {
+      //   this.platform.backButton.subscribeWithPriority(-1, () => {
+      //     // const onRoot = !this.routerOutlet.canGoBack() || this.router.url === '/home' || this.router.url === '/login';
+      //     const onRoot = !this.routerOutlet.canGoBack();
+      //     if (this.debug) { console.log(this.constructor.name + '.ensureExitAppOnAndroid()', onRoot); }
+      //     if (onRoot) { App.exitApp(); }
+      //   });
+      // });
+    // }
+  }
+
 
   /** Force exit the app. This should only be used in conjunction with the backButton handler for Android to exit the app when navigation is complete.
    *
@@ -73,15 +79,15 @@ export class AppPlugin {
    * Returns: never
    */
   async exitApp(): Promise<void> {
-    return this.device.ready().then(() => {
-      if (this.device.isRealPhone) {
-        return App.exitApp();
-      } else if (this.device.isElectron) {
-        return CapacitorElectronMetacodi.exitApp();
-      } else {
-        return Promise.resolve();
-      }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    const isElectron = this.device.isElectron;
+    if (isRealPhone) {
+      return App.exitApp();
+    } else if (isElectron) {
+      return CapacitorElectronMetacodi.exitApp();
+    } else {
+      return Promise.resolve();
+    }
   }
 
   /** Return information about the app.
@@ -95,12 +101,13 @@ export class AppPlugin {
    * ```
    */
    async getInfo(): Promise<AppInfo | undefined> {
-    return this.device.ready().then(() => {
-      if (this.device.isRealPhone || this.device.isElectron) {
-        return App.getInfo();
-      } 
+    const isRealPhone = await this.device.isRealPhone;
+    const isElectron = this.device.isElectron;
+    if (isRealPhone || isElectron) {
+      return App.getInfo();
+    } else {
       return Promise.resolve(undefined);
-    });
+    }
   }
   // async getInfo(): Promise<AppInfo> {
   //   return App.getInfo();
@@ -116,13 +123,14 @@ export class AppPlugin {
    * const state = { isActive: true }
    * ```
    */
-  async getState(): Promise<AppState | undefined> {
-    return this.device.ready().then(() => {
-      if (this.device.isRealPhone || this.device.isElectron) {
-        return App.getState();
-      }
-      return Promise.resolve(undefined);
-    }); 
+  async getState(): Promise<AppState> {
+    const isRealPhone = await this.device.isRealPhone;
+    const isElectron = this.device.isElectron;
+    if (isRealPhone || isElectron) {
+      return App.getState();
+    } else {
+      return Promise.resolve({ isActive: true });
+    }
   }
 
   /** Get the URL the app was launched with, if any.
@@ -137,6 +145,19 @@ export class AppPlugin {
   /** Minimizes the application. */
   async minimizeApp(): Promise<void> {
     return App.minimizeApp();
+  }
+
+  /** Resolve if app is Active */
+  get isActive(): Promise<boolean> {
+    return new Promise<boolean>(async (resolve: any) => {
+      const isRealPhone = await this.device.isRealPhone;
+      if (isRealPhone) {
+        const appState = await App.getState();
+        resolve(appState.isActive);
+      } else {
+        resolve(false);
+      }
+    });
   }
 
 }

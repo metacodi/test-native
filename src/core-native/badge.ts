@@ -17,7 +17,7 @@ import { DevicePlugin } from './device';
   providedIn: 'root'
 })
 export class BadgePlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('BadgePlugin');
 
   constructor(
     public device: DevicePlugin,
@@ -29,6 +29,7 @@ export class BadgePlugin {
    * export interface IsSupportedResult {
    *   isSupported: boolean;
    * }
+   *
    * @returns isSupported: boolean;
    */
   async isSupported(): Promise<IsSupportedResult> {
@@ -39,6 +40,7 @@ export class BadgePlugin {
    * export interface GetBadgeResult {
    *   count: number;
    * }
+   *
    * @returns count: number;
    */
   async get(): Promise<GetBadgeResult> {
@@ -48,9 +50,9 @@ export class BadgePlugin {
   /** Aumenta en 1 el valor del Badge */
   async increase(): Promise<void> {
     return Badge.increase();
-    
+
   }
-  
+
   /** Devementa en 1 el valor del Badge */
   async decrease(): Promise<void> {
     return Badge.decrease();
@@ -65,6 +67,7 @@ export class BadgePlugin {
    * export interface PermissionStatus {
    *   display: PermissionState; <--- 'prompt' | 'prompt-with-rationale' | 'granted' | 'denied';
    * }
+   *
    * @returns display: PermissionState;
    */
   async checkPermissions(): Promise<PermissionStatus> {
@@ -75,31 +78,32 @@ export class BadgePlugin {
    * export interface PermissionStatus {
    *   display: PermissionState; <--- 'prompt' | 'prompt-with-rationale' | 'granted' | 'denied';
    * }
+   *
    * @returns display: PermissionState;
    */
   async requestPermissions(): Promise<PermissionStatus> {
     return Badge.requestPermissions();
   }
-  
+
   /** Set Badge. */
   async setBagde(badgeNumber: number): Promise<void> {
-    return this.device.ready().then(async () => {
-      if (this.device.isRealPhone) {
-        if (badgeNumber > 0){
-          Badge.set({count: badgeNumber});
-        } else {
-          Badge.clear();
-        }
-        return;
-      } else if (this.device.isElectron) {
-        badgeNumber = badgeNumber === undefined || badgeNumber < 1 ? 0 : badgeNumber;
-        CapacitorElectronMetacodi.setBadge({ value: badgeNumber});
-      } else  {
-        const isSupported = await this.isSupported();
-        if (isSupported.isSupported) { Badge.set({count: badgeNumber}); }
-        return;
+    const isElectron = this.device.isElectron;
+    const isRealPhone = await this.device.isRealPhone;
+    if (isRealPhone) {
+      if (badgeNumber > 0) {
+        Badge.set({count: badgeNumber});
+      } else {
+        Badge.clear();
       }
-    });
+      return;
+    } else if (isElectron) {
+      badgeNumber = badgeNumber === undefined || badgeNumber < 1 ? 0 : badgeNumber;
+      CapacitorElectronMetacodi.setBadge({ value: badgeNumber});
+    } else  {
+      const isSupported = await this.isSupported();
+      if (isSupported.isSupported) { Badge.set({count: badgeNumber}); }
+      return;
+    }
   }
 
 }

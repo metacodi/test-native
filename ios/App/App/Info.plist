@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>test-native</string>
+	<string>ion8</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -22,6 +22,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -66,5 +70,14 @@
 	<string>For calls VOICE IP</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Recognize speech</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>google-authenticator</string>
+		<string>comgooglemaps</string>
+		<string>waze</string>
+		<string>google-authenticator</string>
+		<string>com.google.android.apps.authenticator2</string>
+		<string>otpauth</string>
+	</array>
 </dict>
 </plist>

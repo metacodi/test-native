@@ -6,7 +6,7 @@ import { DevicePlugin, KeyboardPlugin } from 'src/core-native';
   templateUrl: './keyboard.page.html',
   styleUrls: ['./keyboard.page.scss'],
 })
-export class KeyboardPage implements OnInit {
+export class KeyboardPage {
 
   constructor(
     public device: DevicePlugin,
@@ -14,8 +14,7 @@ export class KeyboardPage implements OnInit {
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'show', args: [], label: 'Show (only supported on Android)'}, 

@@ -6,15 +6,14 @@ import { NetworkPlugin } from 'src/core-native';
   templateUrl: './network.page.html',
   styleUrls: ['./network.page.scss'],
 })
-export class NetworkPage implements OnInit {
+export class NetworkPage {
 
   constructor(
     public network: NetworkPlugin) { }
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'getStatus', args: [] }, 

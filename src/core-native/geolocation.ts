@@ -1,16 +1,14 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject, timeout } from 'rxjs';
 
 import { CallbackID, Geolocation, GeolocationPluginPermissions, Position, PositionOptions, WatchPositionCallback } from '@capacitor/geolocation';
 
 import { registerPlugin } from '@capacitor/core';
 
-import { BackgroundGeolocationPlugin } from "@capacitor-community/background-geolocation";
+import { BackgroundGeolocationPlugin } from '@capacitor-community/background-geolocation';
 
 import { DevicePlugin } from './device';
 import { AppPlugin } from './app';
-import { BackgroundModePlugin } from './background-mode';
-import { AppState } from '@capacitor/app';
 import { NativeConfig } from './native-config';
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
@@ -22,10 +20,10 @@ const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('Backg
  * Wrapper para el plugin `Geolocation`.
  *
  * **Capacitor**
- * 
+ *
  * - Api: {@link https://capacitor.ionicframework.com/docs/apis/geolocation}
  * - Api: {@link https://github.com/capacitor-community/background-geolocation}
- * 
+ *
  * ** Install **
  * npm i @capacitor/geolocation
  * npm i @capacitor-community/background-geolocation
@@ -38,37 +36,33 @@ const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('Backg
  */
 
 /**
- * NOTA: 
- * 
+ * NOTA:
+ *
  * Recorda informar dels info.list per IOS i AndroidManifes.xml per android,
- * 
+ *
  * Si vols activar el brackgound Mode Geolocation, tens que anar a les configuració del dispositiu als permisos de la geolocalitzacio de l'app i activar 'Geo Sempre'
  */
 @Injectable({
   providedIn: 'root'
 })
 export class GeolocationPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('GeolocationPlugin');
 
   /** Referència a la promesa retornada per obtenir la posició. */
   positionPromise: Promise<Position> | undefined;
   /** Identificador del procés de watching pel backgraound geolocation. */
   backgroundWatcherId: any;
-  /** Indicador d'estat per iniciar o aturar el watcher quan l'app passa a segon pla. */
-  continuousGeolocationRequired = false;
   /** Subscriptor intern per obtenir la posició en background mode. */
-  backgroundGeolocationSubject = new Subject<Position>();
+  backgroundGeolocationSubject = new Subject<Position | undefined>();
 
   user: any;
   connection: any;
 
   constructor(
     public device: DevicePlugin,
-    // public app: AppPlugin,
-    // public backgroundMode: BackgroundModePlugin,
+    public app: AppPlugin
   ) {
-     if (this.debug) {console.log(this.constructor.name + '.constructor()'); }
-    // this.app.stateChangedSubject.subscribe(state => this.onAppStateChanged(state));
+    if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
   }
 
 
@@ -101,46 +95,63 @@ export class GeolocationPlugin {
   }
 
   /** Obtener la ubicación GPS actual del dispositivo. */
-  async getCurrentPosition(options?: PositionOptions): Promise<Position> {
-    if (this.positionPromise) { return this.positionPromise; }
+  async getCurrentPosition(options?: PositionOptions, from?: string): Promise<Position> {
+    if (this.debug) { console.log(this.constructor.name + 'CN !!this.positionPromise  ' + from + ' =>', !!this.positionPromise); }
+    if (!!this.positionPromise) { return this.positionPromise; }
     this.positionPromise = new Promise<Position>(async (resolve: any, reject: any) => {
+      if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition(position) -> before ready()'); }
       this.device.ready().then(async () => {
+        if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition(position) -> after ready()'); }
         // Comprovem si hem d'obtenir la posició de background mode o normal.
-        // if (this.backgroundMode.isActive === true && this.backgroundMode.isEnabled === true) {
-        //   // const sub = this.backgroundGeolocationSubject.subscribe(position => {
-        //   const sub = this.backgroundGeolocationSubject.subscribe({
-        //     next: position => {
-        //        if (this.debug) { console.log('getCurrentPosition background position:', JSON.stringify(position)); }
-        //       sub.unsubscribe();
-        //       this.positionPromise = undefined;
-        //       resolve(position);
-        //     },
-        //     error: error => {
-        //       sub.unsubscribe();
-        //       this.positionPromise = undefined;
-        //       resolve(error);
-        //     },
-        //   });
+        const isActive = await this.app.isActive;
+        if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition(position) -> app.isActive', isActive); }
+        if (!isActive) {
+          if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition(position) -> backgroundGeolocationSubject.subscribe()'); }
+          // const timeoutBackground = new Observable<any>(observer => observer.next(this.lastPosition));
+          const timeoutBackground = new Observable<any>(observer => {
+            if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition(position) -> timeoutBackground!!!!!!!!!!!!!'); }
+            observer.next(undefined);
+          });
+          const sub = this.backgroundGeolocationSubject.pipe(timeout({
+            each: 30 * 1000,
+            with: () => timeoutBackground,
+            // with: () => throwError(() => new CustomTimeoutError())
+          })).subscribe({
+            next: position => {
+              if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition(position) background =>', JSON.stringify(position)); }
+              sub.unsubscribe();
+              this.positionPromise = undefined;
+              resolve(position);
+            },
+            error: error => {
+              if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition(position) -> backgroundGeolocationSubject.subscribe() => error'); }
+              sub.unsubscribe();
+              this.positionPromise = undefined;
+              resolve(error);
+            },
+          });
 
-        // } else {
-        //   //  if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition() isRealPhone', this.device.isRealPhone); }
-        //   //  if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition() options', JSON.stringify(options)); }
-        //   if (!options) { options = {}; }
-        //   options.enableHighAccuracy = true;
-        //   /** Capacitor 4 {@link https://capacitorjs.com/docs/updating/4-0#geolocation Timeout is now ignored for getCurrentPosition} */
-        //   // const period = 5 * 1000;
-        //   // const timeout = setTimeout(() => reject('timeout'), period);
-        //   Geolocation.getCurrentPosition(options).then(position => {
-        //     // clearTimeout(timeout);
-        //      if (this.debug) { console.log('getCurrentPosition position:', JSON.stringify(position)); }
-        //     this.positionPromise = undefined;
-        //     resolve(position);
-        //   }).catch((error) => {
-        //     // clearTimeout(timeout);
-        //     this.positionPromise = undefined;
-        //     reject(error);
-        //   });
-        // }
+        } else {
+          //  if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition() options', JSON.stringify(options)); }
+          if (!options) { options = {}; }
+          options.enableHighAccuracy = true;
+          /** Capacitor 4 {@link https://capacitorjs.com/docs/updating/4-0#geolocation Timeout is now ignored for getCurrentPosition} */
+          // const period = 5 * 1000;
+          // const timeout = setTimeout(() => reject('timeout'), period);
+          Geolocation.getCurrentPosition(options).then(position => {
+            // clearTimeout(timeout);
+            if (this.debug) { console.log(this.constructor.name + '.getCurrentPosition(position) =>', JSON.stringify(position)); }
+            this.positionPromise = undefined;
+            resolve(position);
+          }).catch((error) => {
+            // clearTimeout(timeout);
+            this.positionPromise = undefined;
+            reject(error);
+          });
+        }
+      }).catch((error) => {
+        this.positionPromise = undefined;
+        reject(error);
       });
     });
     return this.positionPromise;
@@ -168,36 +179,9 @@ export class GeolocationPlugin {
   //  BackgroundGeolocation
   // ---------------------------------------------------------------------------------------------------
 
-  // async setContinuousGeolocationRequired(value: boolean) {
-  //   const old = this.continuousGeolocationRequired;
-  //   this.continuousGeolocationRequired = value;
-  //   if (old !== value) {
-  //     const state = await this.app.getState();
-  //     if (state) {
-  //       this.backgroundMode.enable();
-  //       this.onAppStateChanged(state);
-  //     }
-  //   }
-  // }
-
-  // private onAppStateChanged(state: AppState) {
-  //   if (this.debug) { console.log(this.constructor.name + '.onAppStateChanged(state) => ', JSON.stringify(state)); }
-  //   if (this.debug) { console.log(this.constructor.name + '.onAppStateChanged(continuousGeolocationRequired) => ', JSON.stringify(this.continuousGeolocationRequired)); }
-  //   if (!!state.isActive || !this.continuousGeolocationRequired) {
-  //     this.backgroundMode.disable();
-  //     this.stopBackgroundGeolocation();
-  //   } else if (this.continuousGeolocationRequired) {
-  //     if (!this.backgroundWatcherId) {
-  //       this.backgroundMode.enable();
-  //       // NOTA: Donem temps al TrackingService perquè estableixi l'usuari.
-  //       setTimeout(() => this.startBackgroundGeolocation(), 100);
-  //     }
-  //   }
-  // }
-  
-  startBackgroundGeolocation(): void {
-    if (this.debug) {console.log('startBackgroundGeolocation result: start'); }
-    this.stopBackgroundGeolocation();
+  async startBackgroundGeolocation(): Promise<void> {
+    if (this.debug) { console.log(this.constructor.name + '.startBackgroundGeolocation()'); }
+    // await this.backgroundMode.enable();
     const extraData = { user: this.user, connection: this.connection };
     BackgroundGeolocation.addWatcher(
       {
@@ -213,7 +197,7 @@ export class GeolocationPlugin {
 
         // The title of the notification mentioned above. Defaults to "Using
         // your location".
-        backgroundTitle: 'Test Native',
+        backgroundTitle: 'Traking You.',
         // Whether permissions should be requested from the user automatically,
         // if they are not already granted. Defaults to "true".
         requestPermissions: true,
@@ -225,12 +209,12 @@ export class GeolocationPlugin {
         stale: true,
         // The minimum number of metres between subsequent locations. Defaults
         // to 0.
-        distanceFilter: 0,
+        distanceFilter: 10,
         // NOTA: ens enviem l'usuari per enviarli per websocket per android.
         extraData,
 
       } as any, result => {
-        if (this.debug) {console.log('BackgroundGeolocation result:', JSON.stringify(result)); }
+        if (this.debug) { console.log(this.constructor.name + ' -> BackgroundGeolocation.addWatcher(result)', JSON.stringify(result)); }
         if (result) {
           const position: Position = {
             timestamp: (result.time as number),
@@ -248,15 +232,17 @@ export class GeolocationPlugin {
         }
       }
     ).then((backgroundWatcherId) => {
-       if (this.debug) {console.log('BackgroundGeolocation backgroundWatcherId:', JSON.stringify(backgroundWatcherId)); }
+      if (this.debug) { console.log(this.constructor.name + ' -> BackgroundGeolocation.then(watcherId)', JSON.stringify(backgroundWatcherId)); }
       this.backgroundWatcherId = backgroundWatcherId;
     });
   }
 
-  private stopBackgroundGeolocation() {
+  async stopBackgroundGeolocation() {
+    if (this.debug) { console.log(this.constructor.name + '.stopBackgroundGeolocation()'); }
     if (!!this.backgroundWatcherId) {
-      if (this.debug) {console.log('BackgroundGeolocation -> stopBackgroundGeolocation: removed'); }
+      if (this.debug) { console.log(this.constructor.name + '-> BackgroundGeolocation.removeWatcher(id)', JSON.stringify(this.backgroundWatcherId)); }
       BackgroundGeolocation.removeWatcher({ id: this.backgroundWatcherId });
+      this.backgroundGeolocationSubject.next(undefined);
       this.backgroundWatcherId = undefined;
     }
   }

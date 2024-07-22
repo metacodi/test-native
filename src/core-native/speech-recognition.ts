@@ -6,7 +6,7 @@ import { Subject, of } from 'rxjs';
 import { DevicePlugin } from './device';
 
 
-import { SpeechRecognition } from "@capacitor-community/speech-recognition";
+import { PermissionStatus, SpeechRecognition } from '@capacitor-community/speech-recognition';
 import { NativeConfig } from './native-config';
 
 
@@ -42,7 +42,7 @@ import { NativeConfig } from './native-config';
   providedIn: 'root'
 })
 export class SpeechRecognitionPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('SpeechRecognitionPlugin');
 
   partialResultsSubject = new Subject<{data: any}>();
 
@@ -50,11 +50,12 @@ export class SpeechRecognitionPlugin {
     public device: DevicePlugin
   ) {
     if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
-    SpeechRecognition.addListener("partialResults", (data: any) => this.partialResultsSubject.next(data));
+    SpeechRecognition.addListener('partialResults', (data: any) => this.partialResultsSubject.next(data));
   }
 
   /**
    * This method will return list of languages supported by the speech recognizer.
+   *
    * @param none
    * @returns languages - array string of languages.
    * example {"languages":[
@@ -67,13 +68,13 @@ export class SpeechRecognitionPlugin {
    * ]}
    */
   async getSupportedLanguages(): Promise<{ languages: any[] }> {
-    return this.device.getInfo().then(async value => {
-      if (!this.device.isRealPhone) { return Promise.resolve({ languages: [] }); } else { return await SpeechRecognition.getSupportedLanguages(); }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve({ languages: [] }); } else { return await SpeechRecognition.getSupportedLanguages(); }
   }
 
   /**
    * This method will start to listen for utterance.
+   *
    * @param language - language key returned from getSupportedLanguages()
    *        maxResults - maximum number of results to return (5 is max)
    *        prompt - prompt message to display on popup (Android only)
@@ -83,69 +84,68 @@ export class SpeechRecognitionPlugin {
    *    OK: {"status":"success","matches":["oye taxi","teletaxi","calle taxi","Toyota taxi","coge taxi","taxi","hoy taxi","oh yeah taxi","porque taxi","oie taxi"]}
    *    ERROR: {"save":false,"callbackId":"118515648","pluginId":"SpeechRecognition","methodName":"start","success":false,"error":{"message":"No match"}}
    */
-  async start(options?: { language: string, maxResults: number, prompt: string, partialResults: boolean, delayEnd: number }): Promise<any> {
-    return this.device.getInfo().then(async value => {
-      if (!this.device.isRealPhone) {
-        return Promise.resolve();
-      } else {
-        return new Promise<any>(async (resolve: any, reject: any) => {
-          const result = await SpeechRecognition.start({
-            language: options?.language,
-            maxResults: options?.maxResults,
-            prompt: options?.prompt,
-            partialResults: options?.partialResults,
-            popup: false
-            
-          });
-          resolve(result);
+  async start(options?: { language: string; maxResults: number; prompt: string; partialResults: boolean; delayEnd: number }): Promise<any> {
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) {
+      return Promise.resolve();
+    } else {
+      return new Promise<any>(async (resolve: any, reject: any) => {
+        const result = await SpeechRecognition.start({
+          language: options?.language,
+          maxResults: options?.maxResults,
+          prompt: options?.prompt,
+          partialResults: options?.partialResults,
+          popup: false
+
         });
-      }
-    });
+        resolve(result);
+      });
+    }
   }
 
   /**
    * This method will stop listening for utterance
+   *
    * @param none
    * @returns void
    */
   async stop(): Promise<any> {
-    return this.device.getInfo().then(async value => {
-      if (!this.device.isRealPhone) { return of(undefined).toPromise(); } else { return await SpeechRecognition.stop(); }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(undefined); } else { return SpeechRecognition.stop(); }
   }
 
   /**
    * This method will check if speech recognition feature is available on the device.
+   *
    * @param none
    * @returns available - boolean true/false for availability
    */
    async available(): Promise<any> {
-    return this.device.getInfo().then(async value => {
-      if (!this.device.isRealPhone) { return of(false).toPromise(); } else { return await SpeechRecognition.available(); }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(false); } else { return SpeechRecognition.available(); }
   }
 
   /**
    * This method will check for audio permissions.
+   *
    * @param none
    * @returns permission - boolean true/false if permissions are granted
    * example: {"permission":true}
    */
    async hasPermission(): Promise<any> {
-    return this.device.getInfo().then(async value => {
-      if (!this.device.isRealPhone) { return of(false).toPromise(); } else { return await SpeechRecognition.hasPermission(); }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(false); } else { return SpeechRecognition.checkPermissions(); }
   }
 
   /**
    * This method will prompt the user for audio permission.
+   *
    * @param none
    * @returns void
    */
-   async requestPermission(): Promise<void> {
-    return this.device.getInfo().then(async value => {
-      if (!this.device.isRealPhone) { return of(undefined).toPromise(); } else { return await SpeechRecognition.requestPermission(); }
-    });
+   async requestPermissions(): Promise<PermissionStatus | undefined> {
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(undefined); } else { return SpeechRecognition.requestPermissions(); }
   }
 
 }

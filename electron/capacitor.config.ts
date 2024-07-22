@@ -1,16 +1,9 @@
-import { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'test-native',
-  webDir: 'www',
-  bundledWebRuntime: false,
-  plugins: {
-    Badge: {
-      persist: true,
-      autoClear: true,
-    }
-  }
+  appName: 'ion8',
+  webDir: 'www'
 };
 
 export default config;

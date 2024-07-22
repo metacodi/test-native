@@ -6,32 +6,21 @@ import { TextZoom, SetOptions } from '@capacitor/text-zoom';
 import { NativeConfig } from './native-config';
 
 /**
- * Wrapper para el plugin `SplashScreen`.
- *
- * **Cordova**
- *
- * ```typescript
- * import { SplashScreen } from '@ionic-native/splash-screen/ngx';
- * ```
+ * Wrapper para el plugin `TextZoom`.
  *
  * **Capacitor**
  *
- * - Api: {@link https://capacitor.ionicframework.com/docs/apis/splash-screen}
+ * - Api: {@link https://capacitorjs.com/docs/apis/text-zoom}
  *
- *
- * SplashScreen.show();
- * SplashScreen.hide();
- * ```
  */
 @Injectable({
   providedIn: 'root'
 })
 export class TextZoomPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('TextZoomPlugin');
 
   constructor(
     public device: DevicePlugin,
-    
   ) {
     if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
   }
@@ -39,15 +28,12 @@ export class TextZoomPlugin {
 
   /** Show the splash screen. */
   async set(value: number): Promise<void> {
-    return this.device.ready().then(() => {
-      // if (this.device.isRealPhone) {
-      //   return SplashScreen.show();
-      // } else {
-      //   return;
-      // }
+    const isRealPhone = await this.device.isRealPhone;
+    if (isRealPhone) {
       return TextZoom.set({ value });
-    });
+    } else {
+      return Promise.resolve();
+    }
   }
-
 
 }

@@ -64,10 +64,10 @@ export class LocalNotificationPlugin implements OnDestroy {
     LocalNotifications.removeAllListeners();
   }
 
-  addListenerlocalNotificationReceived(callback: (notification: any) => void): PluginListenerHandle {
+  addListenerlocalNotificationReceived(callback: (notification: any) => void): Promise<PluginListenerHandle> {
     return LocalNotifications.addListener('localNotificationReceived', callback);
   }
-  addListenerlocalNotificationActionPerformed(callback: (notificationAction: any) => void): PluginListenerHandle {
+  addListenerlocalNotificationActionPerformed(callback: (notificationAction: any) => void): Promise<PluginListenerHandle> {
     // this.electronService.
     return LocalNotifications.addListener('localNotificationActionPerformed', callback);
   }
@@ -85,20 +85,20 @@ export class LocalNotificationPlugin implements OnDestroy {
     });
   }
 
-  checkPermissions(): Promise<PermissionStatus> {
-    return this.device.getInfo().then(value => {
-      return LocalNotifications.checkPermissions();
-    });
+  async checkPermissions(): Promise<PermissionStatus> {
+    return this.device.ready().then(value => LocalNotifications.checkPermissions());
   }
 
   push(options: { idNotification: number; title: string; message?: string; sound?: string; schedule?: Date }): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<any>(async (resolve, reject) => {
 
       let localUrl = '';
-      if (this.device.isAndroid) {
+      const isIos = await this.device.isIos;
+      const isAndroid = await this.device.isAndroid;
+      if (isAndroid) {
         localUrl = '/android_asset/public/assets/audio/';
-      } else if (this.device.isIos) {
-        localUrl = '/assets/audio/';
+      } else if (isIos) {
+        localUrl = './public/assets/audio/';
       }
 
       const at = options.schedule === undefined ? new Date(Date.now() + 500) : options.schedule;

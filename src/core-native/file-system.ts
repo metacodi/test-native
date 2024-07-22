@@ -47,7 +47,7 @@ const fileOpener = FileOpener;
  * npm i file-saver
  * npm i @types/file-saver
  * npm i @capacitor/filesystem
- * 
+ *
  * **Capacitor**
  *
  * - Api: {@link https://capacitor.ionicframework.com/docs/apis/filesystem}
@@ -65,7 +65,7 @@ const fileOpener = FileOpener;
   providedIn: 'root'
 })
 export class FileSystemPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('FileSystemPlugin');
 
   constructor(
     public device: DevicePlugin,
@@ -81,48 +81,47 @@ export class FileSystemPlugin {
 
   /** Write a file to disk in the specified location on device. */
   async writeFile(options: { fileName: string; fileType?: string; path?: string; directory?: FileSystemPluginDirectory; data?: any; encoding?: Encoding; recursive?: boolean }): Promise<GenericFileResult> {
-    return new Promise<GenericFileResult>((resolve: any, reject: any) => {
+    return new Promise<GenericFileResult>(async (resolve: any, reject: any) => {
       try {
-        this.device.getInfo().then(async value => {
-          if (this.device.isRealPhone) {
-            const fileSystemDirectory: Directory = this.getFileSystemDirectoryDevices(options.directory);
-            // if (!options) { options = {}; }
-            if (!options.recursive === undefined && !options.path) { options.recursive = true; }
-            if (!options.fileName === undefined) { options.fileName = (options.fileName as string).replace('/', ''); }
-            const feResults = await this.fileExists({ fileName: (options.fileName as string), path: (options.path as string), directory: options.directory });
-            if (feResults.status) { const dfResults = await Filesystem.deleteFile({ path: (options.path as string) ? (options.path as string) + '/' + options.fileName : options.fileName, directory: fileSystemDirectory }); }
-            Filesystem.writeFile({ path: options.path ? options.path + '/' + options.fileName : options.fileName, data: options.data, directory: fileSystemDirectory, encoding: options.encoding, recursive: options.recursive })
-              .then(results => resolve({ status: true, value: results.uri })).catch(error => reject({ status: false, message: 'FileSystemPlugin.writeFileError', error }));
-            // } else if (this.device.isElectron && options.fileType === 'pdf') {
-            //   if (!options) { options = {}; }
-            //   if (!options.recursive === undefined && !options.path) { options.recursive = true; }
-            //   if (!options.fileName === undefined) { options.fileName = (options.fileName as string).replace('/', ''); }
+        const isRealPhone = await this.device.isRealPhone;
+        if (isRealPhone) {
+          const fileSystemDirectory: Directory = await this.getFileSystemDirectoryDevices(options.directory);
+          // if (!options) { options = {}; }
+          if (!options.recursive === undefined && !options.path) { options.recursive = true; }
+          if (!options.fileName === undefined) { options.fileName = (options.fileName as string).replace('/', ''); }
+          const feResults = await this.fileExists({ fileName: (options.fileName as string), path: (options.path as string), directory: options.directory });
+          if (feResults.status) { const dfResults = await Filesystem.deleteFile({ path: (options.path as string) ? (options.path as string) + '/' + options.fileName : options.fileName, directory: fileSystemDirectory }); }
+          Filesystem.writeFile({ path: options.path ? options.path + '/' + options.fileName : options.fileName, data: options.data, directory: fileSystemDirectory, encoding: options.encoding, recursive: options.recursive })
+            .then(results => resolve({ status: true, value: results.uri })).catch(error => reject({ status: false, message: 'FileSystemPlugin.writeFileError', error }));
+          // } else if (this.device.isElectron && options.fileType === 'pdf') {
+          //   if (!options) { options = {}; }
+          //   if (!options.recursive === undefined && !options.path) { options.recursive = true; }
+          //   if (!options.fileName === undefined) { options.fileName = (options.fileName as string).replace('/', ''); }
 
-            //   const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
-            //   const fileSystemEle = this.device.electronService.remote.require('fs');
-            //   const barra = this.device.electronService.isMacOS ? '/' : '\\';
-            //   const fullPath = fileSystemDirectory + (options.path ? barra + options.path : '') + barra + options.fileName;
-            //   const feResults = await this.fileExists({ fileName: options.fileName, path: options.path, directory: options.directory });
-            //   fileSystemEle.writeFile(fullPath, options.data, 'base64', (error: any, info: any) => {
-            //     if (error) {
-            //       reject({ status: false, message: 'FileSystemPlugin.writeFileError', error });
-            //     }
-            //     resolve({ status: true, value: fullPath });
-            //   });
+          //   const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
+          //   const fileSystemEle = this.device.electronService.remote.require('fs');
+          //   const barra = this.device.electronService.isMacOS ? '/' : '\\';
+          //   const fullPath = fileSystemDirectory + (options.path ? barra + options.path : '') + barra + options.fileName;
+          //   const feResults = await this.fileExists({ fileName: options.fileName, path: options.path, directory: options.directory });
+          //   fileSystemEle.writeFile(fullPath, options.data, 'base64', (error: any, info: any) => {
+          //     if (error) {
+          //       reject({ status: false, message: 'FileSystemPlugin.writeFileError', error });
+          //     }
+          //     resolve({ status: true, value: fullPath });
+          //   });
+        } else {
+          if (options?.data) {
+            const fileType = options.fileType || 'pdf';
+            const fileName = options.fileName || 'Document.' + fileType;
+            const contentType = this.getMimeType(fileType);
+            const blob = this.base64toBlob(options.data, contentType);
+            saveAs(blob, fileName); // FileSaver.js
+            resolve({ status: true, value: fileName });
+
           } else {
-            if (options?.data) {
-              const fileType = options.fileType || 'pdf';
-              const fileName = options.fileName || 'Document.' + fileType;
-              const contentType = this.getMimeType(fileType);
-              const blob = this.base64toBlob(options.data, contentType);
-              saveAs(blob, fileName); // FileSaver.js
-              resolve({ status: true, value: fileName });
-
-            } else {
-              reject({ status: false, message: 'FileSystemPlugin.errorWhitoutData' });
-            }
+            reject({ status: false, message: 'FileSystemPlugin.errorWhitoutData' });
           }
-        }).catch(error => reject({ status: false, message: 'FileSystemPlugin.writeFileError', error }));
+        }
       } catch (error) {
         reject({ status: false, message: 'FileSystemPlugin.writeFileError', error });
       }
@@ -138,36 +137,35 @@ export class FileSystemPlugin {
   // deleteFile(options: DeleteFileOptions): Promise<void> {
   //   return Filesystem.deleteFile(options);
   // }
-  async deleteFile(options: { fileName: string; path?: string; directory?: FileSystemPluginDirectory; }): Promise<GenericFileResult> {
-    return new Promise<GenericFileResult>((resolve: any, reject: any) => {
+  async deleteFile(options: { fileName: string; path?: string; directory?: FileSystemPluginDirectory }): Promise<GenericFileResult> {
+    return new Promise<GenericFileResult>(async (resolve: any, reject: any) => {
       try {
-        this.device.getInfo().then(async value => {
-          if (this.device.isRealPhone) {
-            const fileSystemDirectory: Directory = this.getFileSystemDirectoryDevices(options.directory);
-            // if (!options) { options = {}; }
-            if (!options.fileName === undefined) { options.fileName = (options.fileName as string).replace('/', ''); }
-            const feResults = await this.fileExists({ fileName: (options.fileName as string), path: (options.path as string), directory: options.directory });
-            if (feResults.status) { 
-              Filesystem.deleteFile({ path: (options.path as string) ? (options.path as string) + '/' + options.fileName : options.fileName, directory: fileSystemDirectory })
-                .then(() => resolve({ status: true }))
-                .catch(() => resolve({ status: false, message: 'FileSystemPlugin.isfileExitstNotFound', fullFileSystemPath: (options.path as string) ? (options.path as string) + '/' + options.fileName : options.fileName, systemPath: fileSystemDirectory  })); 
-            } else {
-              resolve(feResults)
-            }
+        const isRealPhone = await this.device.isRealPhone;
+        if (isRealPhone) {
+          const fileSystemDirectory: Directory = await this.getFileSystemDirectoryDevices(options.directory);
+          // if (!options) { options = {}; }
+          if (!options.fileName === undefined) { options.fileName = (options.fileName as string).replace('/', ''); }
+          const feResults = await this.fileExists({ fileName: (options.fileName as string), path: (options.path as string), directory: options.directory });
+          if (feResults.status) {
+            Filesystem.deleteFile({ path: (options.path as string) ? (options.path as string) + '/' + options.fileName : options.fileName, directory: fileSystemDirectory })
+              .then(() => resolve({ status: true }))
+              .catch(() => resolve({ status: false, message: 'FileSystemPlugin.isfileExitstNotFound', fullFileSystemPath: (options.path as string) ? (options.path as string) + '/' + options.fileName : options.fileName, systemPath: fileSystemDirectory  }));
           } else {
-            // if (options?.data) {
-            //   const fileType = options.fileType || 'pdf';
-            //   const fileName = options.fileName || 'Document.' + fileType;
-            //   const contentType = this.getMimeType(fileType);
-            //   const blob = this.base64toBlob(options.data, contentType);
-            //   saveAs(blob, fileName); // FileSaver.js
-            //   resolve({ status: true, value: fileName });
-
-            // } else {
-            //   reject({ status: false, message: 'FileSystemPlugin.errorWhitoutData' });
-            // }
+            resolve(feResults);
           }
-        }).catch(error => reject({ status: false, message: 'FileSystemPlugin.writeFileError', error }));
+        } else {
+          // if (options?.data) {
+          //   const fileType = options.fileType || 'pdf';
+          //   const fileName = options.fileName || 'Document.' + fileType;
+          //   const contentType = this.getMimeType(fileType);
+          //   const blob = this.base64toBlob(options.data, contentType);
+          //   saveAs(blob, fileName); // FileSaver.js
+          //   resolve({ status: true, value: fileName });
+
+          // } else {
+          //   reject({ status: false, message: 'FileSystemPlugin.errorWhitoutData' });
+          // }
+        }
       } catch (error) {
         reject({ status: false, message: 'FileSystemPlugin.writeFileError', error });
       }
@@ -182,27 +180,26 @@ export class FileSystemPlugin {
    * @recursive ?: boolean; - Whether to create any missing parent directories as well. Defaults to false
    */
   async mkdir(options: { path: string; directory: FileSystemPluginDirectory; recursive?: boolean }): Promise<MkdirFileResult> {
-    return new Promise<MkdirFileResult>((resolve: any, reject: any) => {
+    return new Promise<MkdirFileResult>(async (resolve: any, reject: any) => {
       try {
-        this.device.getInfo().then(value => {
-          if (this.device.isRealPhone) {
-            const fileSystemDirectory: Directory = this.getFileSystemDirectoryDevices(options.directory);
-            Filesystem.mkdir({ path: options.path, directory: fileSystemDirectory, recursive: options.recursive }).then(() => resolve({ status: true })).catch(error => resolve({ status: false, message: 'FileSystemPlugin.mkdirFileError', error }));
-            // } else if (this.device.isElectron) {
-            //   const fileSystemEle = this.device.electronService.remote.require('fs');
-            //   this.fileExists({ path: options.path, directory: options.directory }).then(result => {
-            //     if (!result.status) {
-            //       const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
-            //       const barra = this.device.electronService.isMacOS ? '/' : '\\';
-            //       const fullPath = fileSystemDirectory + (options.path ? barra + options.path : '');
-            //       fileSystemEle.mkdirSync(fullPath, options.recursive);
-            //     }
-            //     resolve({ status: true });
-            //   });
-          } else {
-            resolve({ status: false, message: 'FileSystemPlugin.mkdirFileError' });
-          }
-        }).catch(error => resolve({ status: false, message: 'FileSystemPlugin.mkdirFileError', error }));
+        const isRealPhone = await this.device.isRealPhone;
+        if (isRealPhone) {
+          const fileSystemDirectory: Directory = await this.getFileSystemDirectoryDevices(options.directory);
+          Filesystem.mkdir({ path: options.path, directory: fileSystemDirectory, recursive: options.recursive }).then(() => resolve({ status: true })).catch(error => resolve({ status: false, message: 'FileSystemPlugin.mkdirFileError', error }));
+          // } else if (this.device.isElectron) {
+          //   const fileSystemEle = this.device.electronService.remote.require('fs');
+          //   this.fileExists({ path: options.path, directory: options.directory }).then(result => {
+          //     if (!result.status) {
+          //       const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
+          //       const barra = this.device.electronService.isMacOS ? '/' : '\\';
+          //       const fullPath = fileSystemDirectory + (options.path ? barra + options.path : '');
+          //       fileSystemEle.mkdirSync(fullPath, options.recursive);
+          //     }
+          //     resolve({ status: true });
+          //   });
+        } else {
+          resolve({ status: false, message: 'FileSystemPlugin.mkdirFileError' });
+        }
       } catch (error) {
         resolve({ status: false, message: 'FileSystemPlugin.mkdirFileError', error });
       }
@@ -250,38 +247,37 @@ export class FileSystemPlugin {
    * Return GenericFileResult type;
    */
   openfile(options: { fileName?: string; fileType?: string; path?: string; directory?: FileSystemPluginDirectory; fullPath?: string; showDialog?: boolean }): Promise<GenericFileResult> {
-    return new Promise<GenericFileResult>((resolve: any, reject: any) => {
+    return new Promise<GenericFileResult>(async (resolve: any, reject: any) => {
       try {
-        this.device.getInfo().then(value => {
-          if (this.device.isRealPhone) {
-            if (!options.fileName === undefined) { options.fileName = (options.fileName as string).replace('/', ''); }
-            if (this.debug) { console.log('options fileExists => ', JSON.stringify(options)); }
-            this.fileExists({ fileName: (options.fileName as string), path: (options.path as string), directory: options.directory }).then(results => {
-              if (this.debug) { console.log('results fileExists => ', JSON.stringify(results)); }
-              const filePath = results.fileNameFullPath || '';
-              const fileType = options.fileType || '';
-              fileOpener.open({filePath, contentType: this.getMimeType(fileType)})
-                .then(() => resolve({ status: true, value: results.fileNameFullPath }))
-                .catch(e => reject({ status: false, message: 'FileSystemPlugin.openfileFileError' }));
-            });
-            // } else if (this.device.isElectron) {
-            //   if (options.fileType === 'pdf') {
-            //     const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
-            //     const barra = this.device.electronService.isMacOS ? '/' : '\\';
-            //     const fullPath = 'file://' + fileSystemDirectory + (options.path ? barra + options.path : '') + barra + options.fileName;
-            //     if (this.debug) { console.log('openfile => ', fullPath); }
-            //     const fileSystemCP = new this.device.electronService.remote.BrowserWindow({
-            //       parent: this.device.electronService.remote.getCurrentWindow(),
-            //       modal: false,
-            //       height: 800,
-            //       width: 600,
-            //      });
-            //     fileSystemCP.loadURL(fullPath);
-            //   } else {
-            //     // DO NOTHING
-            //   }
-          }
-        }).catch(error => reject({ status: false, message: 'FileSystemPlugin.openfileFileError', error }));
+        const isRealPhone = await this.device.isRealPhone;
+        if (isRealPhone) {
+          if (!options.fileName === undefined) { options.fileName = (options.fileName as string).replace('/', ''); }
+          if (this.debug) { console.log('options fileExists => ', JSON.stringify(options)); }
+          this.fileExists({ fileName: (options.fileName as string), path: (options.path as string), directory: options.directory }).then(results => {
+            if (this.debug) { console.log('results fileExists => ', JSON.stringify(results)); }
+            const filePath = results.fileNameFullPath || '';
+            const fileType = options.fileType || '';
+            fileOpener.open({filePath, contentType: this.getMimeType(fileType)})
+              .then(() => resolve({ status: true, value: results.fileNameFullPath }))
+              .catch(e => reject({ status: false, message: 'FileSystemPlugin.openfileFileError' }));
+          });
+          // } else if (this.device.isElectron) {
+          //   if (options.fileType === 'pdf') {
+          //     const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
+          //     const barra = this.device.electronService.isMacOS ? '/' : '\\';
+          //     const fullPath = 'file://' + fileSystemDirectory + (options.path ? barra + options.path : '') + barra + options.fileName;
+          //     if (this.debug) { console.log('openfile => ', fullPath); }
+          //     const fileSystemCP = new this.device.electronService.remote.BrowserWindow({
+          //       parent: this.device.electronService.remote.getCurrentWindow(),
+          //       modal: false,
+          //       height: 800,
+          //       width: 600,
+          //      });
+          //     fileSystemCP.loadURL(fullPath);
+          //   } else {
+          //     // DO NOTHING
+          //   }
+        }
       } catch (error) {
         reject({ status: false, message: 'FileSystemPlugin.openfileFileError', error });
       }
@@ -299,46 +295,45 @@ export class FileSystemPlugin {
    * Return DownloadFileResult type;
    */
   downloadFile(options: { url: string; fileName: string; path: string; directory: FileSystemPluginDirectory }): Promise<DownloadFileResult> {
-    return new Promise<DownloadFileResult>((resolve: any, reject: any) => {
+    return new Promise<DownloadFileResult>(async (resolve: any, reject: any) => {
       try {
-        this.device.getInfo().then(value => {
-          if (this.device.isRealPhone) {
-            const fileSystemDirectory: Directory = this.getFileSystemDirectoryDevices(options.directory);
-            const to: string = options.path ? options.path + '/' + options.fileName : options.fileName;
-            this.fileExists(options).then(async result => {
-              if (result.status) { await Filesystem.deleteFile({ path: to, directory: fileSystemDirectory }); }
-              // FileDownloader.download({ url: options.url, filename: options.fileName }).then(doc => {
-              //   this.copy({
-              //     from: options.fileName,
-              //     to,
-              //     directory: this.getFileSystemDirectoryDevices(FileSystemPluginDirectory.Download),
-              //     toDirectory: fileSystemDirectory
-              //   }).then();
-              // }).catch(error => {
-              //   reject({ status: false, message: 'FileSystemPlugin.downloadFileError.errorDownload', error });
-              // });
-            });
-            // } else if (this.device.isElectron) {
-            //   const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
-            //   const DownloadManager = this.device.electronService.remote.require('electron-download-manager');
-            //   this.mkdir({ path: options.path, directory: options.directory, recursive: true }).then(() => {
-            //     DownloadManager.download({
-            //       url: options.url
-            //     }, (error: any, info: any) => {
-            //       if (error) {
-            //         reject({ status: false, message: 'FileSystemPlugin.downloadFileError.errorDownload', error });
-            //       }
-            //       const barra = this.device.electronService.isMacOS ? '/' : '\\';
-            //       const fileSystemDownloads = info.filePath;
-            //       const fullPath = fileSystemDirectory + barra + (options.path ? options.path + barra + options.fileName : options.fileName);
-            //       const fileSystemEle = this.device.electronService.remote.require('fs');
-            //       if (fileSystemDownloads !== fullPath) { fileSystemEle.renameSync(fileSystemDownloads, fullPath); }
-            //       resolve({ status: true, fullFileSystemPath: fullPath });
-            //     });
-            //   });
-          }
+        const isRealPhone = await this.device.isRealPhone;
+        if (isRealPhone) {
+          const fileSystemDirectory: Directory = await this.getFileSystemDirectoryDevices(options.directory);
+          const to: string = options.path ? options.path + '/' + options.fileName : options.fileName;
+          this.fileExists(options).then(async result => {
+            if (result.status) { await Filesystem.deleteFile({ path: to, directory: fileSystemDirectory }); }
+            // FileDownloader.download({ url: options.url, filename: options.fileName }).then(doc => {
+            //   this.copy({
+            //     from: options.fileName,
+            //     to,
+            //     directory: this.getFileSystemDirectoryDevices(FileSystemPluginDirectory.Download),
+            //     toDirectory: fileSystemDirectory
+            //   }).then();
+            // }).catch(error => {
+            //   reject({ status: false, message: 'FileSystemPlugin.downloadFileError.errorDownload', error });
+            // });
+          });
+          // } else if (this.device.isElectron) {
+          //   const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
+          //   const DownloadManager = this.device.electronService.remote.require('electron-download-manager');
+          //   this.mkdir({ path: options.path, directory: options.directory, recursive: true }).then(() => {
+          //     DownloadManager.download({
+          //       url: options.url
+          //     }, (error: any, info: any) => {
+          //       if (error) {
+          //         reject({ status: false, message: 'FileSystemPlugin.downloadFileError.errorDownload', error });
+          //       }
+          //       const barra = this.device.electronService.isMacOS ? '/' : '\\';
+          //       const fileSystemDownloads = info.filePath;
+          //       const fullPath = fileSystemDirectory + barra + (options.path ? options.path + barra + options.fileName : options.fileName);
+          //       const fileSystemEle = this.device.electronService.remote.require('fs');
+          //       if (fileSystemDownloads !== fullPath) { fileSystemEle.renameSync(fileSystemDownloads, fullPath); }
+          //       resolve({ status: true, fullFileSystemPath: fullPath });
+          //     });
+          //   });
+        }
 
-        }).catch(error => reject({ status: false, message: 'FileSystemPlugin.downloadFileError', error }));
       } catch (error) {
         reject({ status: false, message: 'FileSystemPlugin.downloadFileError', error });
       }
@@ -355,42 +350,41 @@ export class FileSystemPlugin {
    * Return isfileExistResult type;
    */
   async fileExists(options: { fileName: string; path: string; directory?: FileSystemPluginDirectory}): Promise<FileExistsResult> {
-    return new Promise<FileExistsResult>((resolve: any, reject: any) => {
+    return new Promise<FileExistsResult>(async (resolve: any, reject: any) => {
       try {
-        this.device.getInfo().then(value => {
-          if (this.device.isRealPhone) {
-            const fileSystemDirectory: Directory = this.getFileSystemDirectoryDevices(options.directory);
-            if (this.debug) { console.log('FileSystemPlugin fileExists arguments =>', { path: options.path, directory: fileSystemDirectory }); }
-            Filesystem.readdir({ path: (options.path as string), directory: fileSystemDirectory }).then(result => {
-              if (result && result.files && options.fileName) {
-                const found = result.files.find(element => element.name === options.fileName);
-                if (found) {
-                  Filesystem.getUri({ path: (options.path as string), directory: fileSystemDirectory }).then((resutsUri: GetUriResult) => resolve({ status: true, fileNameFullPath: resutsUri.uri + '/' + options.fileName, systemPath: resutsUri.uri })).catch(error => resolve({ status: false, message: 'FileSystemPlugin.isfileExistError => getUri', error }));
-                } else {
-                  resolve({ status: false, message: 'FileSystemPlugin.isfileExistNotFound', fileNameFullPath: options.fileName, systemPath: fileSystemDirectory });
-                }
-              } else if (result && !options.fileName) {
-                Filesystem.getUri({ path: (options.path as string), directory: fileSystemDirectory }).then((resutsUri: GetUriResult) => resolve(({ status: true, systemPath: resutsUri.uri }))).catch(error => resolve({ status: false, message: 'FileSystemPlugin.isfileExistError => getUri', error }));
+        const isRealPhone = await this.device.isRealPhone;
+        if (isRealPhone) {
+          const fileSystemDirectory: Directory = await this.getFileSystemDirectoryDevices(options.directory);
+          if (this.debug) { console.log('FileSystemPlugin fileExists arguments =>', { path: options.path, directory: fileSystemDirectory }); }
+          Filesystem.readdir({ path: (options.path as string), directory: fileSystemDirectory }).then(result => {
+            if (result && result.files && options.fileName) {
+              const found = result.files.find(element => element.name === options.fileName);
+              if (found) {
+                Filesystem.getUri({ path: (options.path as string), directory: fileSystemDirectory }).then((resutsUri: GetUriResult) => resolve({ status: true, fileNameFullPath: resutsUri.uri + '/' + options.fileName, systemPath: resutsUri.uri })).catch(error => resolve({ status: false, message: 'FileSystemPlugin.isfileExistError => getUri', error }));
               } else {
-                resolve({ status: false, message: 'FileSystemPlugin.isfileExistNotFound' });
+                resolve({ status: false, message: 'FileSystemPlugin.isfileExistNotFound', fileNameFullPath: options.fileName, systemPath: fileSystemDirectory });
               }
-            }).catch(error => resolve({ status: false, message: 'FileSystemPlugin.isfileExistError => readdir =>', error }));
-            // } else if (this.device.isElectron) {
-            //   const barra = this.device.electronService.isMacOS ? '/' : '\\';
-            //   const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
-            //   const fullPath = fileSystemDirectory + (options.path ? barra + options.path : '') + (options.fileName ? barra + options.fileName : '');
-            //   const fileSystemEle = this.device.electronService.remote.require('fs');
-            //   const existsSync = fileSystemEle.existsSync(fullPath);
-            //   if (existsSync) {
-            //     resolve({ status: true, fileNameFullPath: fullPath, systemPath: fileSystemDirectory });
-            //   } else {
-            //     resolve({ status: false, message: 'FileSystemPlugin.isfileExistNotFound' });
-            //   }
-          } else {
-            resolve({ status: false, message: 'FileSystemPlugin.isfileExistNotFound' });
-          }
+            } else if (result && !options.fileName) {
+              Filesystem.getUri({ path: (options.path as string), directory: fileSystemDirectory }).then((resutsUri: GetUriResult) => resolve(({ status: true, systemPath: resutsUri.uri }))).catch(error => resolve({ status: false, message: 'FileSystemPlugin.isfileExistError => getUri', error }));
+            } else {
+              resolve({ status: false, message: 'FileSystemPlugin.isfileExistNotFound' });
+            }
+          }).catch(error => resolve({ status: false, message: 'FileSystemPlugin.isfileExistError => readdir =>', error }));
+          // } else if (this.device.isElectron) {
+          //   const barra = this.device.electronService.isMacOS ? '/' : '\\';
+          //   const fileSystemDirectory: string = this.device.electronService.remote.app.getPath(this.getFileSystemDirectoryDesktop(options.directory));
+          //   const fullPath = fileSystemDirectory + (options.path ? barra + options.path : '') + (options.fileName ? barra + options.fileName : '');
+          //   const fileSystemEle = this.device.electronService.remote.require('fs');
+          //   const existsSync = fileSystemEle.existsSync(fullPath);
+          //   if (existsSync) {
+          //     resolve({ status: true, fileNameFullPath: fullPath, systemPath: fileSystemDirectory });
+          //   } else {
+          //     resolve({ status: false, message: 'FileSystemPlugin.isfileExistNotFound' });
+          //   }
+        } else {
+          resolve({ status: false, message: 'FileSystemPlugin.isfileExistNotFound' });
+        }
 
-        }).catch(error => resolve({ status: false, message: 'FileSystemPlugin.isfileExistError', error }));
       } catch (error) {
         resolve({ status: false, message: 'FileSystemPlugin.isfileExistError', error });
       }
@@ -398,13 +392,15 @@ export class FileSystemPlugin {
 
   }
 
-  getFileSystemDirectoryDevices(directory: FileSystemPluginDirectory | undefined): Directory {
-
+  async getFileSystemDirectoryDevices(directory: FileSystemPluginDirectory | undefined): Promise<Directory> {
+    const isRealPhone = await this.device.isRealPhone;
+    const isAndroid = await this.device.isAndroid;
+    const isIos = await this.device.isIos;
     switch (directory) {
       case FileSystemPluginDirectory.Download:
-        if (this.device.isRealPhone && this.device.isAndroid) {
+        if (isRealPhone && isAndroid) {
           return Directory.External;
-        } else if (this.device.isRealPhone && this.device.isIos) {
+        } else if (isRealPhone && isIos) {
           return Directory.Documents;
         }
         break;

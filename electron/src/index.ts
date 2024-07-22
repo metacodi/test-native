@@ -15,9 +15,7 @@ unhandled();
 const trayMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [new MenuItem({ label: 'Quit App', role: 'quit' })];
 const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
   { role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu' },
-  { role: 'editMenu' },
-  { role: 'windowMenu' },
-  { role: 'toggleDevTools' },
+  { role: 'viewMenu' },
 ];
 
 // Get Config options from capacitor.config

@@ -1,26 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { AppPlugin, DevicePlugin } from 'src/core-native';
+import { IonicSafeString, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-app',
   templateUrl: './app.page.html',
   styleUrls: ['./app.page.scss'],
 })
-export class AppPage implements OnInit {
+export class AppPage {
 
   
   constructor(
     public device: DevicePlugin,
-    public app: AppPlugin
+    public app: AppPlugin,
+    private toastController: ToastController
   ) { }
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'getInfo', args: []},
+    { fn: 'getState', args: []},
     { fn: 'exitApp', args: []}, 
 
   ]
@@ -34,5 +36,13 @@ export class AppPage implements OnInit {
   }
  
   label(method: any): string { return method?.label ? method.label : method.fn; }
+
+  async presentToast() {
+    const toast = await this.toastController.create({
+        message: new IonicSafeString('<ion-button>Hello!</ion-button> <br> Hola <b>Tu</b>'),
+        duration: 2000
+    });
+    toast.present();
+  }
 
 }

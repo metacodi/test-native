@@ -6,14 +6,13 @@ import { StatusBarPlugin } from 'src/core-native';
   templateUrl: './status-bar.page.html',
   styleUrls: ['./status-bar.page.scss'],
 })
-export class StatusBarPage implements OnInit {
+export class StatusBarPage {
   constructor(
     public status: StatusBarPlugin) { }
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'show', args: [] }, 

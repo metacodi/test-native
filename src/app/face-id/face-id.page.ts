@@ -1,21 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { DevicePlugin, FaceIdPlugin } from 'src/core-native';
+import { DevicePlugin, BiometricPlugin } from 'src/core-native';
 
 @Component({
   selector: 'app-face-id',
   templateUrl: './face-id.page.html',
   styleUrls: ['./face-id.page.scss'],
 })
-export class FaceIdPage implements OnInit {
+export class FaceIdPage {
 
   constructor(
     public device: DevicePlugin,
-    public badge: FaceIdPlugin) { }
+    public badge: BiometricPlugin) { }
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'isAvailable', args: [] }, 

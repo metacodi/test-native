@@ -165,108 +165,152 @@ then
   echo "do $1"
   echo "----------> npm i @angular/google-maps"
   npm i @angular/google-maps
-  echo "----------> npm i @awesome-cordova-plugins/background-mode"
-  npm i @awesome-cordova-plugins/background-mode
-  echo "----------> npm i @awesome-cordova-plugins/calendar"
-  npm i @awesome-cordova-plugins/calendar
-  echo "----------> npm i @awesome-cordova-plugins/file"
-  npm i @awesome-cordova-plugins/file
-  echo "----------> npm i @awesome-cordova-plugins/in-app-browser"
-  npm i @awesome-cordova-plugins/in-app-browser
-  echo "----------> npm i @awesome-cordova-plugins/launch-navigator"
-  npm i @awesome-cordova-plugins/launch-navigator
-  echo "----------> npm i @awesome-cordova-plugins/media"
-  npm i @awesome-cordova-plugins/media
+
   echo "----------> npm i @capacitor-community/background-geolocation"
   npm i @capacitor-community/background-geolocation
+  
   echo "----------> npm i @capacitor-community/electron"
   npm i @capacitor-community/electron
+  
   echo "----------> npm i @capacitor-community/fcm"
   npm i @capacitor-community/fcm
+  
   echo "----------> npm i @capacitor-community/file-opener"
   npm i @capacitor-community/file-opener
+  
   echo "----------> npm i @capacitor-community/keep-awake"
   npm i @capacitor-community/keep-awake
+  
+  echo "----------> npm i @capacitor-community/native-audio"
+  npm i @capacitor-community/native-audio
+  
   echo "----------> npm i @capacitor-community/speech-recognition"
   npm i @capacitor-community/speech-recognition
+  
+  echo "----------> npm i @capacitor-community/text-to-speech"
+  npm i @capacitor-community/text-to-speech
+  
   echo "----------> npm i @capacitor/action-sheet"
   npm i @capacitor/action-sheet
+  
   echo "----------> npm i @capacitor/android"
   npm i @capacitor/android
+  
+  echo "----------> npm i @capacitor/app-launcher"
+  npm i @capacitor/app-launcher
+  
+  echo "----------> npm i @capacitor/browser"
+  npm i @capacitor/browser
+  
+  echo "----------> npm i @capacitor/clipboard"
+  npm i @capacitor/clipboard
+  
   echo "----------> npm i @capacitor/device"
   npm i @capacitor/device
+  
   echo "----------> npm i @capacitor/filesystem"
   npm i @capacitor/filesystem
+  
   echo "----------> npm i @capacitor/geolocation"
   npm i @capacitor/geolocation
+  
   echo "----------> npm i @capacitor/ios"
   npm i @capacitor/ios
+  
   echo "----------> npm i @capacitor/local-notifications"
   npm i @capacitor/local-notifications
+  
   echo "----------> npm i @capacitor/network"
   npm i @capacitor/network
+  
   echo "----------> npm i @capacitor/push-notifications"
   npm i @capacitor/push-notifications
+  
   echo "----------> npm i @capacitor/splash-screen"
   npm i @capacitor/splash-screen
-    echo "----------> npm i @capacitor/capacitor-app-update"
-  npm i @capacitor/capacitor-app-update
-    echo "----------> npm i @capacitor/capacitor-badge"
-  npm i @capacitor/capacitor-badge
+  
+  echo "----------> npm i @capacitor/text-zoom"
+  npm i @capacitor/text-zoom
+  
+  echo "----------> npm i @capawesome/capacitor-app-update"
+  npm i @capawesome/capacitor-app-update
+  
+  echo "----------> npm i @capawesome/capacitor-badge"
+  npm i @capawesome/capacitor-badge
+  
+  echo "----------> npm i @googlemaps/js-api-loader"
+  npm i @googlemaps/js-api-loader
+  
   echo "----------> npm i @ionic/storage-angular"
   npm i @ionic/storage-angular
-  echo "----------> npm i @logisticinfotech/ionic4-datepicker"
-  npm i @logisticinfotech/ionic4-datepicker
+  
+  echo "----------> npm i @metacodi/capacitor-calendar"
+  npm i @metacodi/capacitor-calendar
+  
   echo "----------> npm i @metacodi/capacitor-electron"
-  npm i @metacodi/capacitor-electron
+  npm i @metacodi/capacitor-electronn
+  
   echo "----------> npm i @ngx-translate/core"
   npm i @ngx-translate/core
+  
   echo "----------> npm i @ngx-translate/http-loader"
   npm i @ngx-translate/http-loader
-  echo "----------> npm i @types/file-saver"
-  npm i @types/file-saver
+  
   echo "----------> npm i angular-svg-icon"
   npm i angular-svg-icon
+  
   echo "----------> npm i capacitor-native-biometric"
   npm i capacitor-native-biometric
-  echo "----------> npm i cordova-plugin-actionsheet"
-  npm i cordova-plugin-actionsheet
-  echo "----------> npm i cordova-plugin-background-mode"
-  npm i cordova-plugin-background-mode
-  echo "----------> npm i cordova-plugin-calendar"
-  npm i cordova-plugin-calendar
-  echo "----------> npm i cordova-plugin-device"
-  npm i cordova-plugin-device
-  echo "----------> npm i cordova-plugin-dialogs"
-  npm i cordova-plugin-dialogs
-  echo "----------> npm i cordova-plugin-file"
-  npm i cordova-plugin-file
-  echo "----------> npm i cordova-plugin-inappbrowser"
-  npm i cordova-plugin-inappbrowser
-  echo "----------> npm i cordova-plugin-media"
-  npm i cordova-plugin-media
-  echo "----------> npm i cordova-plugin-navigationbar-color"
-  npm i cordova-plugin-navigationbar-color
+  
   echo "----------> npm i file-saver"
   npm i file-saver
+  
   echo "----------> npm i jssip"
   npm i jssip
+  
+  echo "----------> npm i mermaid"
+  npm i mermaid
+  
   echo "----------> npm i moment"
   npm i moment
+  
   echo "----------> npm i socket.io"
   npm i socket.io
+  
   echo "----------> npm i socket.io-client"
   npm i socket.io-client
-  echo "----------> npm i uk.co.workingedge.phonegap.plugin.launchnavigator"
-  npm i uk.co.workingedge.phonegap.plugin.launchnavigator
-  sh do npmidev
-  sh do platforms
+  
 fi
 
 if [ $FIRST_ARGUMENT == "npmidev" ] 
 then
+    
+    echo "npm i @metacodi/node-api-client -D"
+    npm i @metacodi/node-api-client -D
+    
+    echo "npm i @metacodi/node-utils -D"
+    npm i @metacodi/node-utils -D
+    
+    echo "npm i @metacodi/precode -D"
+    npm i @metacodi/precode -D
+    
+    echo "npm i chalk -D"
+    npm i chalk -D
+    
+    echo "npm i @types/express -D"
+    npm i @types/express -D
+    
+    echo "npm i express -D"
+    npm i express -D
+    
+    echo "npm i @types/file-saver -D"
+    npm i @types/file-saver -D
+
     echo "npm i @types/google.maps -D"
     npm i @types/google.maps -D
+    
+    echo "npm i ts-node -D"
+    npm i ts-node -D
     # echo "npm i @types/jasmine -D"
     # npm i @types/jasmine -D
     # echo "npm i @types/jasminewd2 -D"

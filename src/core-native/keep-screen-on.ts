@@ -26,7 +26,7 @@ const { CapacitorKeepScreenOn } = Plugins;
   providedIn: 'root'
 })
 export class CapacitorKeepScreenOnPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('CapacitorKeepScreenOnPlugin');
 
   constructor(public device: DevicePlugin) {
     if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
@@ -35,27 +35,32 @@ export class CapacitorKeepScreenOnPlugin {
 
   /** Enable keep screen on. */
   async enable(): Promise<void> {
-    return this.device.getInfo().then(value => {
-      if (!this.device.isRealPhone) { return of(undefined).toPromise(); } else { return KeepAwake.keepAwake(); }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (isRealPhone) {
+      return KeepAwake.keepAwake();
+    } else {
+      return Promise.resolve();
+    }
   }
 
   /** Disable keep screen on. */
   async disable(): Promise<void> {
-    return this.device.getInfo().then(value => {
-      if (!this.device.isRealPhone) { return of(undefined).toPromise(); } else { return KeepAwake.allowSleep(); }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (isRealPhone) {
+      KeepAwake.allowSleep();
+    } else {
+      Promise.resolve();
+    }
   }
-  
+
   /** Whether keep awake is supported or not. */
   async isSupported(): Promise<IsSupportedResult> {
-    return this.device.getInfo().then(() => {
-      if (this.device.isRealPhone) {
-        return KeepAwake.isSupported();
-      } else {
-        return Promise.resolve({ isSupported: false });
-      }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (isRealPhone) {
+      return KeepAwake.isSupported();
+    } else {
+      return Promise.resolve({ isSupported: false });
+    }
   }
 
 }

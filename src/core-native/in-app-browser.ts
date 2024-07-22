@@ -5,7 +5,8 @@ import { Observable, of } from 'rxjs';
 
 // import { ElectronService } from 'ngx-electron';
 // import { InAppBrowser, InAppBrowserObject, InAppBrowserOptions } from '@ionic-native/in-app-browser/ngx';
-import { InAppBrowser, InAppBrowserObject, InAppBrowserOptions } from '@awesome-cordova-plugins/in-app-browser/ngx';
+// import { InAppBrowser, InAppBrowserObject, InAppBrowserOptions } from '@awesome-cordova-plugins/in-app-browser/ngx';
+import { Browser, OpenOptions } from '@capacitor/browser';
 
 import { DevicePlugin } from './device';
 import { BrowserWindowConstructorOptions } from 'electron';
@@ -26,7 +27,7 @@ export interface StatusUpdateResults { status: 'navigate' | 'close'; url?: strin
  * ```
  * Usage
  * ```typescript
- * import { InAppBrowserPlugin } from 'src/core/native';
+ * import { InAppBrowserPlugin } from 'src/core-native';
  *
  * constructor(public iab: InAppBrowserPlugin){}
  * ```
@@ -35,14 +36,14 @@ export interface StatusUpdateResults { status: 'navigate' | 'close'; url?: strin
   providedIn: 'root'
 })
 export class InAppBrowserPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('InAppBrowserPlugin');
 
   browserIAP: any;
   isOpened: boolean;
 
   constructor(
     public device: DevicePlugin,
-    public iab: InAppBrowser,
+    // public iab: InAppBrowser,
     // public electronService: ElectronService,
   ) {
     if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
@@ -57,38 +58,12 @@ export class InAppBrowserPlugin {
    * @param options.url : Url to navigate
    * @param options.optionsWindow
    *
-   *  InAppBrowserOptions (mobile) {@link https://github.com/apache/cordova-plugin-inappbrowser#cordovainappbrowseropen }
-   *
-   *  OR
-   *
+   *  Browser (mobile) {@link https://capacitorjs.com/docs/apis/browser }
+   *  
+   *  npm install @capacitor/browser
+   *  
    *  BrowserWindowConstructorOptions (electron) {@link https://www.electronjs.org/docs/api/browser-window#clase-browserwindow }
-   *
-   * Sample Mobile
-   * ```typescript
-   * this.iab.openWindow({ url: 'https://domain.ext/', '_blank', optionsWindow: {
-   *        location: 'no',
-   *        clearcache: 'yes',
-   *        toolbar: 'yes',
-   *        hidenavigationbuttons: 'yes',
-   *        closebuttoncolor: '#3880ff',
-   *        toolbarcolor: '#ffffff',
-   *        hideurlbar: 'no',
-   *        closebuttoncaption: '< ' + this.translate.instant('buttons.back')
-   *      } }).then(window => {
-   *    this.iab.onStatusUpdate().subscribe(result => {
-   *     // When url is change return string
-   *     if (result.status === 'navigate') {
-   *       console.log('onStatusUpdate => Navigate', result.url);
-   *     }
-   *     // If window is closed
-   *     if (result.status === 'close') {
-   *       console.log('onStatusUpdate => Closed');
-   *     }
-   *   });
-   * });
-   * ```
-   * Sample Electron
-   * ```typescript
+   * 
    * this.iab.openWindow({ url: 'https://domain.ext/', optionsWindow: { width: 1000, height: 800 } }).then(window => {
    *   this.iab.onStatusUpdate().subscribe(result => {
    *     // When url is change return string
@@ -101,17 +76,21 @@ export class InAppBrowserPlugin {
    *     }
    *   });
    * });
-   * ```
+   * 
    */
 
-  async openWindow(options: { url: string; optionsWindow: InAppBrowserOptions | BrowserWindowConstructorOptions}): Promise<any |InAppBrowserObject> {
-    return this.device.ready().then(() => {
+  async openWindow(options: { url: string; optionsWindow: OpenOptions | BrowserWindowConstructorOptions}): Promise<any> {
+    return this.device.ready().then(async () => {
       if (this.isOpened) { this.close(); }
-      if (this.device.isElectron) {
+      const isElectron = this.device.isElectron;
+      const isRealPhone = await this.device.isRealPhone;
+      const isMobileWeb = await this.device.is('mobileweb');
+      const platform = await this.device.platform;
+      if (isElectron) {
         CapacitorElectronMetacodi.openWindow({ url: options.url, optionsWindow: options.optionsWindow});
         return;
-      } else if (this.device.isRealPhone || this.device.is('mobileweb')  || this.device.info.platform === 'web') {
-        return this.browserIAP = this.iab.create(options.url, '_blank', (options.optionsWindow as InAppBrowserOptions));
+      } else if (isRealPhone || isMobileWeb || platform === 'web') {
+        return Browser.open({ url: options.url }).then(() => {}, (reason: any) => { console.log('Browser.open => reason ', JSON.stringify(reason)); });
       } else {
         return;
       }
@@ -119,44 +98,50 @@ export class InAppBrowserPlugin {
   }
 
   onStatusUpdate(): Observable<StatusUpdateResults> {
-
     return new Observable<StatusUpdateResults>(observer => {
-      if (this.device.isRealPhone) {
-        this.browserIAP.on('loadstop').subscribe((event: any) => {
-          this.isOpened = true;
-          observer.next({ status: 'navigate', url: event.url });
-        });
-        this.browserIAP.on('exit').subscribe((event: any) => {
-          this.isOpened = false;
-          observer.next({ status: 'close' });
-          observer.complete();
-        });
-      } else if (this.device.isElectron) {
-        let currentUrl = '';
-        const timerId = setInterval(() => {
-          CapacitorElectronMetacodi.getUrl().then(value => {
-            if (value.isClosed) {
-              this.isOpened = false;
-              clearInterval(timerId);
-              observer.next({ status: 'close' });
-              observer.complete();
-            } else if (currentUrl !== value.url) {
-              currentUrl = value.url;
+      const isElectron = this.device.isElectron;
+      this.device.isRealPhone.then(isRealPhone => {
+        if (isRealPhone) {
+          Browser.addListener('browserFinished', () => {
               this.isOpened = true;
-              observer.next({ status: 'navigate', url: currentUrl });
-            }
+              observer.next({ status: 'navigate', url: '' });
+              Browser.removeAllListeners();
+              observer.complete();
           });
-        }, 250);
-      }
+          Browser.addListener('browserPageLoaded', () => {
+              this.isOpened = true;
+              observer.next({ status: 'navigate', url: '' });
+          });
+        } else if (isElectron) {
+          let currentUrl = '';
+          const timerId = setInterval(() => {
+            CapacitorElectronMetacodi.getUrl().then(value => {
+              if (value.isClosed) {
+                this.isOpened = false;
+                clearInterval(timerId);
+                observer.next({ status: 'close' });
+                observer.complete();
+              } else if (currentUrl !== value.url) {
+                currentUrl = value.url;
+                this.isOpened = true;
+                observer.next({ status: 'navigate', url: currentUrl });
+              }
+            });
+          }, 250);
+        }
+      });
     });
   }
 
   close(): Promise<any> {
-    return new Promise<any>((resolve: any, reject: any) => {
+    return new Promise<any>(async (resolve: any, reject: any) => {
       if (this.isOpened) {
-        if (this.device.isRealPhone) {
-          this.browserIAP?.hide();
-        } else if (this.device.isElectron) {
+        const isElectron = this.device.isElectron;
+        const isRealPhone = await this.device.isRealPhone;
+        if (isRealPhone) {
+          Browser.removeAllListeners();
+          Browser.close();
+        } else if (isElectron) {
           CapacitorElectronMetacodi?.closeWindow();
         }
         resolve(true);

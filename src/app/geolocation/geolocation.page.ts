@@ -7,7 +7,7 @@ import { WatchPositionCallback } from '@capacitor/geolocation';
   templateUrl: './geolocation.page.html',
   styleUrls: ['./geolocation.page.scss'],
 })
-export class GeolocationPage implements OnInit {
+export class GeolocationPage {
 
   constructor(
     public device: DevicePlugin,
@@ -21,8 +21,7 @@ export class GeolocationPage implements OnInit {
 
   watchPositionId = '';
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'checkPermissions', args: []}, 

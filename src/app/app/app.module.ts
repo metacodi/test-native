@@ -12,6 +12,7 @@ import { AppPage } from './app.page';
   imports: [
     CommonModule,
     FormsModule,
+    // IonicModule.forRoot({innerHTMLTemplatesEnabled:true}),
     IonicModule,
     AppPageRoutingModule
   ],

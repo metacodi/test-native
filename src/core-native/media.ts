@@ -1,6 +1,6 @@
 import { ElementRef, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Media, MediaObject } from '@awesome-cordova-plugins/media/ngx';
+import { NativeAudio } from '@capacitor-community/native-audio'
 
 import { DevicePlugin } from './device';
 
@@ -33,13 +33,12 @@ import { NativeConfig } from './native-config';
 export class MediaPlugin {
   protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
 
-  file: MediaObject;
+  testNativerAudio = true;
+  assetId: string;
   soundPlay: any;
   playSounds: ElementRef;
-  isPlay = false;
   loop: boolean = false;
   constructor(
-    private media: Media,
     public device: DevicePlugin,
     // public user: UserService,
   ) {
@@ -48,164 +47,115 @@ export class MediaPlugin {
 
   /** Create a media and play.
    *
-   * @param string src — A URI containing the audio content.
+   * @param src: string; A URI containing the audio content.
+   * @param loop: boolean; loop Will loop the audio file for playback..
+   * @param volumen: number; Will set the new volume for a audio file, numerical value of the volume between 0.1 - 1.0.
    * If audio file is on 'assets', example: 'audio/file.mp3'
-   * @iosOptions : {
-   *   @numberOfLoops ?: number;
-   *   @playAudioWhenScreenIsLocked ?: boolean;
-   * }
-   * @external boolean:false default
+   * @external boolean:false pass true if assetPath is a `file://` or `https://` url
    */
-  play(options: { src: string; loop?: boolean; iosOptions?: { numberOfLoops?: number; playAudioWhenScreenIsLocked?: boolean }; external?: boolean }): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
+  async play(options: { src: string; loop?: boolean; volumen?: number; external?: boolean }): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
       try {
-        this.device.getInfo().then(value => {
-          if (this.device.isRealPhone) {
-            let localUrl = '';
-            if (!options.external) {
-              if (this.device.isAndroid) {
-                localUrl = '/android_asset/public/assets/';
-              } else if (this.device.isIos) {
-                localUrl = 'assets/';
-              }
-            }
-            this.loop = options.loop || false;
-            this.file = this.media.create(localUrl + options.src);
-            this.file.onSuccess.subscribe(() => {
-              this.isPlay = false;
-              if (this.loop) {
-                this.file.play(options.iosOptions);
-                this.isPlay = true;
-              }
-            });
-            this.file.onStatusUpdate.subscribe(status => console.log('status file: ---------------------------->', status));
-            this.file.play(options.iosOptions);
-            this.isPlay = true;
+        let localUrl = '../';
+        const isRealPhone = await this.device.isRealPhone;
+        if (isRealPhone) { localUrl = 'public/assets/'; }
+           
+        this.assetId = options.src;
+
+        await NativeAudio.preload({
+          assetId: options.src,
+          assetPath: localUrl + options.src,
+          audioChannelNum: 1,
+          isUrl: options.external || false
+        }).catch((reason: any) => reject(reason));
+
+        if (options.volumen) { this.setVolume(options.volumen); };
+
+        await NativeAudio.play({ assetId: options.src });
+
+        if (options.loop) { NativeAudio.loop({ assetId: options.src }); };
+
+        if (isRealPhone) {
+          NativeAudio.addListener('complete', ({ assetId }) => {
+            if (this.debug) { console.log('Completed audio ', assetId); }
             resolve(localUrl + options.src);
-          } else {
-          // } else if (this.device.isElectron || this.device.isVirtual) {
-            /**
-             * Es necessari afegir el objecte de audio a appcomponent.html
-             * <audio #playSound controls style="display: none;"></audio>
-             */
-            
-             const tono = options.src;
-             const localUrl = 'assets/';
-             const { nativeElement } = this.playSounds;
-             nativeElement.src = localUrl + tono ;
-             nativeElement.volume = 1;
-             nativeElement.loop = options.loop === undefined ? false : options.loop;
-             nativeElement.play();
-             resolve(nativeElement.src);
-
-            // CapacitorElectronMetacodi.playSound({ src: options.src }).then( res => {
-            //   console.log('CapacitorElectronMetacodi.playSound => res: ', res);
-            //   if (this.debug) {
-            //   }
-            // });
-
-          //   if (!options.external) {
-          //     const pathApp = this.device.electronService.remote.app.getPath('exe');
-          //     const soundplayer = this.device.electronService.remote.require('sound-player');
-          //     const path = this.device.electronService.remote.require('path');
-          //     let urlMp3 = '';
-          //     if (this.device.electronService.isMacOS) {
-          //       urlMp3 = path.join(pathApp, '../../assets/', options.src);
-          //     } else if (this.device.electronService.isWindows) {
-          //       urlMp3 = path.join(pathApp, '../assets/', options.src);
-          //     }
-          //     // console.log(urlMp3);
-          //     const optionsSoundplayer = {
-          //       filename: urlMp3,
-          //       gain: 10,
-          //       debug: false,
-          //     };
-          //     this.soundPlay = new soundplayer(optionsSoundplayer);
-          //     this.soundPlay.play();
-          //     const self = this;
-          //     this.soundPlay.on('complete', () => self.isPlay = false);
-          //     this.isPlay = true;
-          //     resolve(urlMp3);
-          //   } else {
-          //     this.soundPlay.play(options.src);
-          //   }
-          }
-        });
-
+            // Descargamos el audio de memoria
+            this.unload();
+          });
+        } else {
+          const interval = setInterval(async () => {
+            const isPlaying = await this.isPlaying(); 
+            if (!isPlaying) { 
+              if (this.debug) { console.log('Completed audio ', this.assetId); }
+              resolve(localUrl + options.src);
+              // Descargamos el audio de memoria
+              this.unload();
+              clearInterval(interval);
+            }
+          }, 100);
+        }
+        
       } catch (error) {
         reject(error);
       }
     });
   }
 
-  /** Media object has completed the current play, record, or stop action. */
-  onSuccess(): Observable<any> {
-    this.isPlay = false;
-    return this.file.onSuccess;
-  }
-
-  /** Indicate status changes. It takes a integer status code
-   * Media.MEDIA_NONE = 0;
-   * Media.MEDIA_STARTING = 1;
-   * Media.MEDIA_RUNNING = 2;
-   * Media.MEDIA_PAUSED = 3;
-   * Media.MEDIA_STOPPED = 4;
-   */
-  onStatusUpdate(): Observable<any> {
-    return this.file.onStatusUpdate;
-  }
-
-  /** If an error occurs. It takes an integer error code */
-  onError(): Observable<any> {
-    return this.file.onError;
-  }
-
-  /** Sets the current position within an audio file.
-   *
-   * @param milliseconds — The time position you want to set for the current audio file.
-   */
-  seekTo(milliseconds: number): void {
-    this.file.seekTo(milliseconds);
-  }
-
   /** Stop an audio file. */
   stop(): void {
-    this.isPlay = false;
-    this.loop = false;
-    this.device.getInfo().then(value => {
-      if (this.device.isRealPhone) {
-        this.file.stop();
-        this.file.release();
-      } else {
-        const { nativeElement } = this.playSounds;
-        nativeElement.pause();
-        // CapacitorElectronMetacodi.stopSound();
-      }
-    });
+    if (this.assetId === undefined) Promise.resolve();
+    this.unload();
+    NativeAudio.stop({ assetId: (this.assetId as string) });
   }
 
-  /** Set the volume for an audio file.
+  /**
+   * This method will unload the audio file from the memory.
    *
-   * @param volume — The volume to set for playback. The value must be within the range of 0.0 to 1.0.
+   * @returns void
+   */
+  async unload(): Promise<void> {
+    if (this.assetId === undefined) return Promise.resolve();
+    await NativeAudio.unload({ assetId: this.assetId });
+    this.assetId = '';
+  }
+
+  /**
+   * This method will return false if audio is paused or not loaded.
+   * 
+   * @returns boolean
+   */  
+  async isPlaying(): Promise<boolean> {
+    if (this.assetId === undefined) return Promise.resolve(false);
+    return NativeAudio.isPlaying({ assetId: this.assetId }).then(result => result.isPlaying);
+  }
+
+  /**
+   * This method will set the new volume for a audio file.
+   * @param assetId - identifier of the asset
+   *        volume - numerical value of the volume between 0.1 - 1.0
+   * @returns void
    */
   setVolume(volume: number): void {
-    this.file.setVolume(volume);
+    if (this.assetId === undefined) Promise.resolve();
+    NativeAudio.setVolume({ assetId: this.assetId, volume });
   }
 
-  /** Get the duration of an audio file in seconds. If the duration is unknown, it returns a value of -1.
-   *
+  /** This method will get the duration of an audio file.
+   * only works if channels == 1
+   * 
    * @returns — Returns the duration of an audio file.
    */
-  getDuration(): number {
-    return this.file?.getDuration();
+  async getDuration(): Promise<number> {
+    return NativeAudio.getDuration({ assetId: this.assetId }).then(result => result.duration);
   }
 
-  /** Get the current position within an audio file. Also updates the Media object's position parameter.
-   *
+  /** This method will get the current time of a playing audio file.
+   * only works if channels == 1
+   * 
    * @returns — Returns a promise with the position of the current recording.
-   */
-  getCurrentPosition(): Promise<any> {
-    return this.file.getCurrentPosition();
+  */
+  async getCurrentTime(): Promise<number> {
+    return NativeAudio.getCurrentTime({ assetId: this.assetId }).then(result => result.currentTime);
   }
 
 }

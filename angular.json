@@ -13,6 +13,16 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "zone.js",
+              "file-saver",
+              "jssip",
+              "moment",
+              "localforage",
+              "@braintree/sanitize-url",
+              "dayjs",
+              "dompurify"
+            ],
             "outputPath": "www",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -31,7 +41,7 @@
                 "output": "./svg"
               }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss"],
+            "styles": ["src/global.scss", "src/theme/variables.scss"],
             "scripts": []
           },
           "configurations": {
@@ -74,10 +84,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "app:build:production"
+              "buildTarget": "app:build:production"
             },
             "development": {
-              "browserTarget": "app:build:development"
+              "buildTarget": "app:build:development"
             },
             "ci": {
               "progress": false
@@ -88,7 +98,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "app:build"
+            "buildTarget": "app:build"
           }
         },
         "test": {
@@ -111,7 +121,7 @@
                 "output": "./svg"
               }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss"],
+            "styles": ["src/global.scss", "src/theme/variables.scss"],
             "scripts": []
           },
           "configurations": {

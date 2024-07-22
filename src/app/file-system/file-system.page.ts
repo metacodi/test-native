@@ -13,14 +13,13 @@ const toBase64 = (file: any) => new Promise((resolve, reject) => {
   templateUrl: './file-system.page.html',
   styleUrls: ['./file-system.page.scss'],
 })
-export class FileSystemPage implements OnInit {
+export class FileSystemPage {
   
   constructor(public fileSystem: FileSystemPlugin) { }
   
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   deleteFile(){
     const fileName = 'factura.pdf';

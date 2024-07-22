@@ -6,15 +6,14 @@ import { TextZoomPlugin } from 'src/core-native';
   templateUrl: './text-zoom.page.html',
   styleUrls: ['./text-zoom.page.scss'],
 })
-export class TextZoomPage implements OnInit {
+export class TextZoomPage {
 
   constructor(
     public status: TextZoomPlugin) { }
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'set', args: [1], label: 'set 100% Light' }, 

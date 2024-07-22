@@ -6,14 +6,13 @@ import { StoragePlugin } from 'src/core-native';
   templateUrl: './storage.page.html',
   styleUrls: ['./storage.page.scss'],
 })
-export class StoragePage implements OnInit {
+export class StoragePage {
   constructor(
     public storage: StoragePlugin) { }
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'set', args: ['name1', { name: 'Nom 1', surmane: 'Cognoms 1'}, 'testNative'], label: 'set 1' }, 

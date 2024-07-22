@@ -6,14 +6,13 @@ import { SplashScreenPlugin } from 'src/core-native';
   templateUrl: './splash-screen.page.html',
   styleUrls: ['./splash-screen.page.scss'],
 })
-export class SplashScreenPage implements OnInit {
+export class SplashScreenPage {
   constructor(
     public splash: SplashScreenPlugin) { }
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'show', args: [{ showDuration: 2000, autoHide: true }] }, 

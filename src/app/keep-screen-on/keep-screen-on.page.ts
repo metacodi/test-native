@@ -6,7 +6,7 @@ import { CapacitorKeepScreenOnPlugin, DevicePlugin } from 'src/core-native';
   templateUrl: './keep-screen-on.page.html',
   styleUrls: ['./keep-screen-on.page.scss'],
 })
-export class KeepScreenOnPage implements OnInit {
+export class KeepScreenOnPage {
 
   constructor(
     public device: DevicePlugin,
@@ -14,9 +14,6 @@ export class KeepScreenOnPage implements OnInit {
   ) { }
 
   results: any = {}
-
-  ngOnInit() {
-  }
 
   methods = [
     { fn: 'enable', args: [] }, 

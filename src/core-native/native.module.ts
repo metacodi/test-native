@@ -1,35 +1,27 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 
-import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
-import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
-import { Media } from '@awesome-cordova-plugins/media/ngx';
-import { File } from '@awesome-cordova-plugins/file/ngx';
 import { NativeConfig } from './native-config';
-
+import { IonicStorageModule } from '@ionic/storage-angular';
 
 @NgModule({
   declarations: [
   ],
   imports: [
     // RouterModule,
+    IonicStorageModule.forRoot()
   ],
   exports: [
     // RouterModule,
   ],
   providers: [
-    // Badge,
-    InAppBrowser,
-    Media,
-    File,
     // FileOpener,
-    BackgroundMode
   ],
 })
-export class NativeModule  {
+export class CoreNativeModule  {
 
-  public static forRoot(config: any): ModuleWithProviders<NativeModule> {
+  public static forRoot(config: any): ModuleWithProviders<CoreNativeModule> {
     return {
-      ngModule: NativeModule,
+      ngModule: CoreNativeModule,
       providers: [
         {
           provide: 'NativeConfig',

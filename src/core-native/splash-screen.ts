@@ -27,7 +27,7 @@ import { NativeConfig } from './native-config';
   providedIn: 'root'
 })
 export class SplashScreenPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('SplashScreenPlugin');
 
   constructor(
     public device: DevicePlugin,
@@ -38,24 +38,22 @@ export class SplashScreenPlugin {
 
   /** Show the splash screen. */
   async show(options: ShowOptions): Promise<void> {
-    return this.device.ready().then(() => {
-      if (this.device.isRealPhone) {
-        return SplashScreen.show();
-      } else {
-        return;
-      }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (isRealPhone) {
+      return SplashScreen.show();
+    } else {
+      return Promise.resolve();
+    }
   }
 
   /** Hide the splash screen. */
   async hide(): Promise<void> {
-    return this.device.ready().then(() => {
-      if (this.device.isRealPhone) {
-        return SplashScreen.hide();
-      } else {
-        return;
-      }
-    });
+    const isRealPhone = await this.device.isRealPhone;
+    if (isRealPhone) {
+      return SplashScreen.hide();
+    } else {
+      return Promise.resolve();
+    }
   }
 
 }

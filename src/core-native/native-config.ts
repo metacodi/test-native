@@ -1,6 +1,6 @@
 
 export const NativeConfig = { 
-  debugEnabled: false,
+  debugEnabled: true,
   debugPlugins: [
     'AppPlugin',
     'BadgePlugin',
@@ -15,6 +15,7 @@ export const NativeConfig = {
     'MediaPlugin',
     'StoragePlugin',
     'SpeechRecognitionPlugin',
+    'TextZoomPlugin',
   ],
   app: {
     package: 'com.metacodi.taxi',

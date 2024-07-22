@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "878880710881",
+    "project_id": "test-ae6b8",
+    "storage_bucket": "test-ae6b8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878880710881:android:5941821d2a850d2ec157a0",
+        "android_client_info": {
+          "package_name": "test.metacodi.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "878880710881-1pt042mtkdlessjuqv86tnvn8g3dgk7u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbrypD8oFD7nOhQdSdf6DodAkS2Ed8ya4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "878880710881-1pt042mtkdlessjuqv86tnvn8g3dgk7u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "878880710881-i268et4nse7por6hacdii31oob80i2od.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "test.metacodi.com"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,7 +6,7 @@ import { DevicePlugin, LocalNotificationPlugin } from 'src/core-native';
   templateUrl: './local-notifications.page.html',
   styleUrls: ['./local-notifications.page.scss'],
 })
-export class LocalNotificationsPage implements OnInit {
+export class LocalNotificationsPage {
 
   constructor(
     public device: DevicePlugin,
@@ -14,8 +14,7 @@ export class LocalNotificationsPage implements OnInit {
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'checkPermissions', args: [] }, 

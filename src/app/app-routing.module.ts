@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'speech-recognition',
+    redirectTo: 'in-app-browser',
     pathMatch: 'full'
   },
   {
@@ -32,10 +32,6 @@ export const routes: Routes = [
     loadChildren: () => import('./file-system/file-system.module').then( m => m.FileSystemPageModule)
   },
   {
-    path: 'background-mode',
-    loadChildren: () => import('./background-mode/background-mode.module').then( m => m.BackgroundModePageModule)
-  },
-  {
     path: 'geolocation',
     loadChildren: () => import('./geolocation/geolocation.module').then( m => m.GeolocationPageModule)
   },
@@ -54,10 +50,6 @@ export const routes: Routes = [
   {
     path: 'media',
     loadChildren: () => import('./media/media.module').then( m => m.MediaPageModule)
-  },
-  {
-    path: 'navigationbar-color',
-    loadChildren: () => import('./navigationbar-color/navigationbar-color.module').then( m => m.NavigationbarColorPageModule)
   },
   {
     path: 'network',
@@ -86,6 +78,18 @@ export const routes: Routes = [
   {
     path: 'text-to-speech',
     loadChildren: () => import('./text-to-speech/text-to-speech.module').then( m => m.TextToSpeechPageModule)
+  },
+  {
+    path: 'app-launcher',
+    loadChildren: () => import('./app-launcher/app-launcher.module').then( m => m.AppLauncherPageModule)
+  },
+  {
+    path: 'background-runner',
+    loadChildren: () => import('./background-runner/background-runner.module').then( m => m.BackgroundRunnerPageModule)
+  },
+  {
+    path: 'image-to-text',
+    loadChildren: () => import('./image-to-text/image-to-text.module').then( m => m.ImageToTextPageModule)
   }
 ];
 

@@ -165,7 +165,7 @@ export class ElectronCapacitorApp {
     // Setup the main manu bar at the top of our window.
     Menu.setApplicationMenu(Menu.buildFromTemplate(this.AppMenuBarMenuTemplate));
 
-    // If the splashscreen is enabled, show it first while the main window loads then dwitch it out for the main window, or just load the main window from the start.
+    // If the splashscreen is enabled, show it first while the main window loads then switch it out for the main window, or just load the main window from the start.
     if (this.CapacitorFileConfig.electron?.splashScreenEnabled) {
       this.SplashScreen = new CapacitorSplashScreen({
         imageFilePath: join(
@@ -224,8 +224,8 @@ export function setupContentSecurityPolicy(customScheme: string): void {
         ...details.responseHeaders,
         'Content-Security-Policy': [
           electronIsDev
-          ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' http://* 'unsafe-eval' https://* 'unsafe-eval' ws://*:* 'unsafe-inline' 'unsafe-eval' wss://*:* 'unsafe-inline' 'unsafe-eval' data:`
-          : `default-src ${customScheme}://* 'unsafe-inline' http://* 'unsafe-eval' https://* 'unsafe-eval' ws://*:* 'unsafe-eval' wss://*:* 'unsafe-eval' data:`,
+            ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' data:`
+            : `default-src ${customScheme}://* 'unsafe-inline' data:`,
         ],
       },
     });

@@ -32,7 +32,7 @@ import { NativeConfig } from './native-config';
   providedIn: 'root'
 })
 export class StatusBarPlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('StatusBarPlugin');
 
   constructor(
     public device: DevicePlugin,
@@ -41,69 +41,59 @@ export class StatusBarPlugin {
   }
 
   /** iOS only. */
-  async addListenerStatusTap(callback: () => void): Promise<PluginListenerHandle | void> {
-    return this.device.getInfo().then(() => {
-      if (!this.device.isRealPhone && this.device.isIos) { return Promise.resolve(); } else { return window.addEventListener('statusTap', callback); }
-    });
+  async addListenerStatusTap(callback: () => void): Promise<void> {
+    const isRealPhone = await this.device.isRealPhone;
+    const isIos = await this.device.isIos;
+    if (!isRealPhone && isIos) { return Promise.resolve(); } else { window.addEventListener('statusTap', callback); return Promise.resolve(); }
   }
 
   /** Show the status bar. */
-  async show(options?: AnimationOptions | undefined): Promise<void> {
-    return this.device.getInfo().then(value => {
-      if (!this.device.isRealPhone) { return Promise.resolve(undefined); } else { return StatusBar.show(options); }
-    });
+  async show(options?: AnimationOptions): Promise<void> {
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(); } else { return StatusBar.show(options); }
   }
 
   /** Hide the status bar. */
-  async hide(options?: AnimationOptions | undefined): Promise<void> {
-    return this.device.getInfo().then(value => {
-      if (!this.device.isRealPhone) { return Promise.resolve(undefined); } else { return StatusBar.hide(options); }
-    });
+  async hide(options?: AnimationOptions): Promise<void> {
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(); } else { return StatusBar.hide(options); }
   }
 
   /** Set the background color of the status bar. */
-  setBackgroundColor(options: BackgroundColorOptions): Promise<StatusBarInfo | void> {
-    return this.device.getInfo().then(value => {
-      if (!this.device.isRealPhone) { return Promise.resolve(); } else { return StatusBar.setBackgroundColor(options); }
-    });
+  async setBackgroundColor(options: BackgroundColorOptions): Promise<void> {
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(); } else { return StatusBar.setBackgroundColor(options); }
   }
 
   /** Get info about the current state of the status bar. */
-  getInfo(): Promise<StatusBarInfo | void> {
-    return this.device.getInfo().then(value => {
-      if (!this.device.isRealPhone) { return Promise.resolve(undefined); } else { return StatusBar.getInfo(); }
-    });
+  async getInfo(): Promise<StatusBarInfo | undefined> {
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(undefined); } else { return StatusBar.getInfo(); }
   }
 
   /** Set whether or not the status bar should overlay the webview to allow usage of the space around a device "notch". */
-  setOverlaysWebView(options: SetOverlaysWebViewOptions): Promise<void> {
-    return this.device.getInfo().then(value => {
-      if (!this.device.isRealPhone) { return Promise.resolve(undefined); } else { return StatusBar.setOverlaysWebView(options); }
-    });
+  async setOverlaysWebView(options: SetOverlaysWebViewOptions): Promise<void> {
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(); } else { return StatusBar.setOverlaysWebView(options); }
   }
 
   /** Set the current style of the status bar. */
-  setStyle(options: StyleOptions): Promise<void> {
-    return this.device.getInfo().then(value => {
-      if (!this.device.isRealPhone) { return Promise.resolve(undefined); } else { return StatusBar.setStyle(options); }
-    });
+  async setStyle(options: StyleOptions): Promise<void> {
+    const isRealPhone = await this.device.isRealPhone;
+    if (!isRealPhone) { return Promise.resolve(); } else { return StatusBar.setStyle(options); }
   }
 
-  setStatusBar(mode: 'light' | 'dark') {
-    if (this.debug) { console.log(this.constructor.name + '.setStatusBar()'); }
-    this.device.ready().then(() => {
-      if (this.debug) { console.log(this.constructor.name + '.setStatusBar() => this.device.platform', this.device.platform); }
-      if (this.device.isReal('ios')) {
-        this.setStyle({ style: mode === 'light' ? Style.Light : Style.Dark });
-      } else if (this.device.isReal('android')) {
-        //  this.setStyle({ style: StatusBarStyle.Dark });
-         this.setStyle({ style: mode === 'light' ? Style.Dark : Style.Light });
-      }
-
-      if (this.debug) { this.getInfo().then( info => { console.log(this.constructor.name + '.getInfo', JSON.stringify(info)); }); }
-    }).catch(error => {
-      if (this.debug) { console.log(this.constructor.name + '.setStatusBar() error =>', error); }
-    });
+  async setStatusBar(mode: 'light' | 'dark') {
+    const platform = await this.device.platform;
+    const isRealPhone = await this.device.isRealPhone;
+    const isIos = await this.device.isIos;
+    const isAndroid = await this.device.isAndroid;
+    if (this.debug) { console.log(this.constructor.name + '.setStatusBar() => this.device.platform', platform); }
+    if (isRealPhone && isIos) {
+      this.setStyle({ style: mode === 'light' ? Style.Light : Style.Dark });
+    } else if (isRealPhone && isAndroid) {
+      this.setStyle({ style: mode === 'light' ? Style.Dark : Style.Light });
+    }
   }
 
 }

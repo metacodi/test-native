@@ -6,7 +6,7 @@ import { DevicePlugin, MediaPlugin } from 'src/core-native';
   templateUrl: './media.page.html',
   styleUrls: ['./media.page.scss'],
 })
-export class MediaPage implements AfterViewInit, OnInit {
+export class MediaPage implements AfterViewInit {
 
   @ViewChild('playSound', { static: true }) playSound: ElementRef;
 
@@ -16,15 +16,20 @@ export class MediaPage implements AfterViewInit, OnInit {
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   ngAfterViewInit(): void {
     this.media.playSounds = this.playSound;
   }
 
   methods = [
-    { fn: 'play', args: [{ src: 'audio/' + 'notification0.mp3'}] }, 
+    // { fn: 'play', args: [{ src: 'notification0.mp3'}] }, 
+    // { fn: 'play', args: [{ src: 'notification1.mp3'}] }, 
+    { fn: 'play', args: [{ src: 'audio/' + 'notification0.mp3', loop: true}] }, 
+    { fn: 'play', args: [{ src: 'audio/' + 'notification1.mp3'}] }, 
+    { fn: 'play', args: [{ src: 'audio/' + 'ring3.mp3'}] }, 
+    { fn: 'play', args: [{ src: 'audio/' + 'ring4.mp3'}] }, 
+    { fn: 'isPlay', args: [] }, 
     { fn: 'stop', args: [] }, 
   ]
 

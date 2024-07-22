@@ -6,14 +6,13 @@ import { DevicePlugin } from 'src/core-native';
   templateUrl: './device.page.html',
   styleUrls: ['./device.page.scss'],
 })
-export class DevicePage implements OnInit {
+export class DevicePage {
 
   constructor(public device: DevicePlugin) { }
 
   results: any = {}
 
-  ngOnInit() {
-  }
+  
 
   methods = [
     { fn: 'getInfo', args: []}, 

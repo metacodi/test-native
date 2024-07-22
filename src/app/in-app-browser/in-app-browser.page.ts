@@ -6,16 +6,13 @@ import { DevicePlugin, InAppBrowserPlugin } from 'src/core-native';
   templateUrl: './in-app-browser.page.html',
   styleUrls: ['./in-app-browser.page.scss'],
 })
-export class InAppBrowserPage implements OnInit {
+export class InAppBrowserPage {
 
   constructor(
     public device: DevicePlugin,
     public iabPlugin: InAppBrowserPlugin) { }
 
   results: any = {}
-
-  ngOnInit() {
-  }
 
   methods = [
     { fn: 'openWindow', args: [{ url: 'https://www.metacodi.com', optionsWindow: { width: 1000, height: 800 } }] }, 
@@ -35,6 +32,12 @@ export class InAppBrowserPage implements OnInit {
           if (result.status === 'close') {
             console.log(this.constructor.name + '.onStatusUpdate => Closed'); 
           }
+          // if (result.status === 'browserFinished') {
+          //   console.log(this.constructor.name + '.onStatusUpdate => browserFinished', result.url); 
+          // }
+          // if (result.status === 'browserPageLoaded') {
+          //   console.log(this.constructor.name + '.onStatusUpdate => browserPageLoaded'); 
+          // }
         });
       }
     } catch (error) {

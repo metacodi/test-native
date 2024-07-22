@@ -2,9 +2,16 @@ import { Injectable } from '@angular/core';
 import { Platforms } from '@ionic/core';
 import { Platform } from '@ionic/angular';
 
-import { BatteryInfo, Device, DeviceId, DeviceInfo, GetLanguageCodeResult, OperatingSystem } from '@capacitor/device';
+import { BatteryInfo, Device, DeviceId, DeviceInfo, GetLanguageCodeResult, LanguageTag, OperatingSystem } from '@capacitor/device';
 
 import { NativeConfig } from './native-config';
+
+
+interface DevicePluginInfo extends DeviceInfo {
+  uuid: string;
+  isoCode: string;
+  langCode: string;
+}
 
 
 /**
@@ -19,40 +26,69 @@ import { NativeConfig } from './native-config';
   providedIn: 'root'
 })
 export class DevicePlugin {
-  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes(this.constructor.name);
+  protected debug = true && NativeConfig.debugEnabled && NativeConfig.debugPlugins.includes('DevicePlugin');
 
   isReady = false;
 
-  info: DeviceInfo;
+  get info(): DevicePluginInfo { return this.deviceInfo; }
+  set info(value: DevicePluginInfo) {
+    this.deviceInfo = value;
+    this.setInstant();
+  }
+  private deviceInfo: DevicePluginInfo;
 
   constructor(
     public plt: Platform,
     // public electronService: ElectronService,
   ) {
-    console.log(this.constructor.name,this.debug);
+    console.log(this.constructor.name, this.debug);
     if (this.debug) { console.log(this.constructor.name + '.constructor()'); }
-    this.plt.ready().then(() => {
-      this.getInfo().then(info => {
-        this.isReady = true;
-        this.info = info;
-      });
-    });
+    this.ready();
   }
 
+
+  // ---------------------------------------------------------------------------------------------------
+  //  instant
+  // ---------------------------------------------------------------------------------------------------
+
+  instant: {
+    platform: string;
+    operatingSystem: OperatingSystem;
+    isVirtual: boolean;
+    isRealPhone: boolean;
+    isIos: boolean;
+    isAndroid: boolean;
+    isElectron: boolean;
+    isWindows: boolean;
+    isMac: boolean;
+  } = {} as any;
+
+  async setInstant() {
+    const platform = await this.platform;
+    const operatingSystem = await this.operatingSystem;
+    const isVirtual = await this.isVirtual;
+    const isRealPhone = await this.isRealPhone;
+    const isIos = await this.isIos;
+    const isAndroid = await this.isAndroid;
+    const isElectron = this.isElectron;
+    const isWindows = await this.isWindows;
+    const isMac = await this.isMac;
+    Object.assign(this.instant, {
+      platform,
+      operatingSystem,
+      isVirtual,
+      isRealPhone,
+      isIos,
+      isAndroid,
+      isElectron,
+      isWindows,
+      isMac,
+    });
+  }
 
   // ---------------------------------------------------------------------------------------------------
   //  Plugin wrapper
   // ---------------------------------------------------------------------------------------------------
-
-  /** Devuelve un identificador único para el dispositivo.
-   * DevicePage getId: IOS {"uuid":"1DC2F7A3-7D67-4759-A7F5-68E03CB1A8C9"}
-   * DevicePage getId: ANDROID {"uuid":"c2e4f48bfdad6c7d"}
-   * DevicePage getId: ELECTRON MAC {"uuid":"a66c1435-e575-48b1-a527-450e6068b1aa"}
-   * DevicePage getId: ELECTRON WINDOWS {"uuid":"787026d3-7d97-49c5-8da4-6795f93ca109"}
-   */
-  getId(): Promise<DeviceId> {
-    return Device.getId();
-  }
 
   /** Devuelve información sobre el dispositivo/sistema operativo/plataforma subyacente.
    * DevicePage getInfo:
@@ -113,25 +149,37 @@ export class DevicePlugin {
    *  "webViewVersion":"93.0.4577.82"
    * }
    */
-  getInfo(): Promise<any> {
-    return new Promise<any>((resolve: any, reject: any) => {
-      if (this.isReady) {
-        resolve(this.info);
-      } else {
-        this.plt.ready().then(() => {
-          // Devolvemos la info del dispositivo.
-          if (this.info) { resolve(this.info); }
-          Device.getId().then( uuid => {
-            Device.getInfo().then(info => {
-              this.isReady = true;
-              this.info = info;
-              (this.info as any).uuid = uuid.uuid;
-              resolve(info);
-            }).catch(error => reject(error));
-          });
-        }).catch(error => reject(error));
+
+  /** Referència a la promesa retornada per obtenir els valors del dispositiu. */
+  devicePromise: Promise<any> | undefined;
+
+  ready(): Promise<DevicePluginInfo> {
+    if (this.isReady && !!this.info) {
+      if (this.debug) { console.log(this.constructor.name + '.ready()', this.info); }
+      return Promise.resolve(this.info);
+    } else {
+      if (!!this.devicePromise) {
+        if (this.debug) { console.log(this.constructor.name + '.ready() -> EXISTING promise', this.info); }
+        return this.devicePromise;
       }
-    });
+      if (this.debug) { console.log(this.constructor.name + '.ready() -> NEW promise', this.info); }
+      this.devicePromise = new Promise<DevicePluginInfo>(async (resolve: any, reject: any) => {
+        this.plt.ready().then(async () => {
+          const uuid = await Device.getId();
+          const isoCode = await this.getIsoCode();
+          const langCode = await this.getLangCode();
+          if (this.debug) { console.log(this.constructor.name + '.ready() -> plt.ready().then() => uuid', uuid); }
+          Device.getInfo().then(info => {
+            this.devicePromise = undefined;
+            this.isReady = true;
+            this.info = { ...info, ...{ uuid: uuid.identifier, isoCode, langCode } };
+            if (this.debug) { console.log(this.constructor.name + '.ready() -> ready.then()', this.info); }
+            resolve(info);
+          }).catch(error => { this.devicePromise = undefined; reject(error); });
+        }).catch(error => { this.devicePromise = undefined; reject(error); });
+      });
+      return this.devicePromise;
+    }
   }
 
   /** Devolver información sobre la batería.
@@ -148,71 +196,80 @@ export class DevicePlugin {
    * DevicePage getLanguageCode: ANDROID {"value":"es"}
    * DevicePage getLanguageCode: ELECTRON {"value":"es"}
    */
-  getLanguageCode(): Promise<GetLanguageCodeResult> {
-    return Device.getLanguageCode();
+  async getIsoCode(): Promise<string> {
+    const language = await Device.getLanguageCode();
+    if (this.info) { this.info.isoCode = language.value; }
+    return language.value;
   }
 
+  /**
+   *
+   * Obtenga la etiqueta de configuración regional del idioma actual del dispositivo.
+   *
+   * @returns value: "en-US"
+   */
+  async getLangCode(): Promise<string> {
+    const language = await Device.getLanguageTag();
+    if (this.info) { this.info.langCode = language.value; }
+    return language.value;
+  }
+
+
+  doesMyVersionMeetMinimum(myVersion: any, minimumVersion: any) {
+
+    if (typeof myVersion === 'number' && typeof minimumVersion === 'number') {
+      return (myVersion >= minimumVersion);
+    }
+
+    let v1 = myVersion.split(".")
+    let v2 = minimumVersion.split(".")
+    let minLength;
+
+    minLength = Math.min(v1.length, v2.length);
+
+    for (let i = 0; i < minLength; i++) {
+      if (Number(v1[i]) < Number(v2[i])) {
+        return false;
+      }
+      else if (Number(v1[i]) < Number(v2[i])) {
+        return true;
+      }
+
+    }
+
+    return (v1.length >= v2.length);
+  }
 
   // ---------------------------------------------------------------------------------------------------
   //  Additional functionality
   // ---------------------------------------------------------------------------------------------------
 
-  /**
-   * Returns a promise when the platform is ready and native functionality can be called.
-   * If the app is running from within a web browser, then the promise will resolve when the DOM is ready.
-   * When the app is running from an application engine such as Cordova, then the promise will resolve when Cordova triggers the deviceready event.
-   *
-   * **Native functionality available immediately**
-   * When using Cordova, you need to wait until the device is ready before making calls to native functionality (e.g. by using platform.ready()).
-   * Capacitor will export JavaScript on app boot so that this is no longer required.
-   */
-  ready(): Promise<DeviceInfo> {
-    return new Promise<DeviceInfo>((resolve: any, reject: any) => {
-      if (this.isReady) {
-        resolve(this.info);
-      } else {
-        this.plt.ready().then(() => {
-          // Devolvemos la info del dispositivo.
-          if (this.info) { resolve(this.info); }
-          this.getInfo().then(info => {
-            this.isReady = true;
-            this.info = info;
-            resolve(info);
-          }).catch(error => reject(error));
-        }).catch(error => reject(error));
-      }
-    });
-  }
-
   /** Comprueba la plataforma del dispositivo. */
-  is(platform: Platforms): boolean {
-    return this.info?.platform === platform;
-  }
+  async is(platform: Platforms): Promise<boolean> { return this.ready().then(info => info.platform === platform); }
 
   /** Comprueba si el dispositivo es de la plataforma indicada y además no es virtual. */
-  isReal(platform: Platforms): boolean {
-    return !this.isVirtual && this.is(platform);
-  }
+  async isReal(platform: Platforms): Promise<boolean> { return this.ready().then(info => !info.isVirtual && info.platform === platform); }
 
   /** Obtiene la plataforma del dispositivo. */
-  // get platform(): DeviceInfo['platform'] { return this.electronService.isElectronApp ? 'electron' : this.info?.platform; }
-  get platform(): string { return this.info?.platform; }
+  // get platform(): Promise<DevicePluginInfo['platform']> { return this.electronService.isElectronApp ? Promise.resolve('electron') : this.ready().then(info => info.platform); }
+  get platform(): Promise<string> { return this.ready().then(info => info.platform); }
   /** Devuelve el sistema operativo del dispositivo. */
-  get operatingSystem(): OperatingSystem { return this.info?.operatingSystem; }
+  get operatingSystem(): Promise<OperatingSystem> { return this.ready().then(info => info.operatingSystem); }
   /** Indica si el dispositivo está virtualizado. */
-  get isVirtual(): boolean { return this.info?.isVirtual; }
+  get isVirtual(): Promise<boolean> { return this.ready().then(info => info.isVirtual); }
   /** Indica si el dispositivo es un teléfono `ios` o `android` no virtualizado. */
-  get isRealPhone(): boolean { return !this.isVirtual && (this.info?.platform === 'ios' || this.info?.platform === 'android'); }
-
+  get isRealPhone(): Promise<boolean> { return this.ready().then(info => !info.isVirtual && (info.platform === 'ios' || info.platform === 'android')); }
   /** Indica si la plataforma del dispositiu és 'iOS'. */
-  get isIos(): boolean { return this.info?.platform === 'ios'; }
+  get isIos(): Promise<boolean> { return this.ready().then(info => info.platform === 'ios'); }
   /** Indica si la plataforma del dispositiu és 'iOS'. */
-  get isAndroid(): boolean { return this.info?.platform === 'android'; }
+  get osVersion(): Promise<string> { return this.ready().then(info => info.osVersion); }
+  /** Indica si la plataforma del dispositiu és 'iOS'. */
+  get isAndroid(): Promise<boolean> { return this.ready().then(info => info.platform === 'android'); }
   /** Indica si la plataforma del dispositiu és 'electron'. */
-  // get isElectron(): boolean { return this.info?.platform === 'electron' || this.info?.operatingSystem === 'windows' || this.info?.operatingSystem === 'mac' || this.info?.operatingSystem === 'linux'; }
+  // get isElectron(): Promise<boolean> { return this.ready().then(info => info.platform === 'electron' || info.operatingSystem === 'windows' || info.operatingSystem === 'mac' || info.operatingSystem === 'linux'); }
   get isElectron(): boolean { return !!window.navigator.userAgent.match(/Electron/); }
   /** Indica si la plataforma del dispositiu és 'windows'. */
-  get isWindows(): boolean { return this.info?.operatingSystem === 'windows'; }
+  get isWindows(): Promise<boolean> { return this.ready().then(info => info.operatingSystem === 'windows'); }
   /** Indica si la plataforma del dispositiu és 'mac'. */
-  get isMac(): boolean { return this.info?.operatingSystem === 'mac'; }
+  get isMac(): Promise<boolean> { return this.ready().then(info => info.operatingSystem === 'mac'); }
 }

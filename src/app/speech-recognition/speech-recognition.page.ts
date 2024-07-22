@@ -6,7 +6,7 @@ import { SpeechRecognitionPlugin } from 'src/core-native';
   templateUrl: './speech-recognition.page.html',
   styleUrls: ['./speech-recognition.page.scss'],
 })
-export class SpeechRecognitionPage implements OnInit {
+export class SpeechRecognitionPage {
   
   constructor(
     public speech: SpeechRecognitionPlugin) { }
